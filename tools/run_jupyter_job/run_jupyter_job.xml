@@ -1,10 +1,15 @@
 <tool id="run_jupyter_job" name="Run long running jupyterlab script" tool_type="interactive" version="0.0.1" profile="21.05">
     <description>inside a Docker container</description>
     <requirements>
-        <container type="docker">docker.io/anupkumar/execute_python_script:min_docker</container>
+        <container type="docker">docker.io/anupkumar/execute_python_script:run_dynamic_job</container>
     </requirements>
+    <entry_points>
+        <entry_point name="Run jupyter script" requires_domain="true">
+	    <port>8888</port>
+	</entry_point>
+    </entry_points>
     <command detect_errors="aggressive"><![CDATA[
-        python '$__tool_directory__/sample_script.py'
+	    python '${__tool_directory__}/main.py' --loaded_file '$select_file' --output_model '$outfile_output_model' --output_array '$outfile_output_arrays'
 ]]>
     </command>
     <inputs>
