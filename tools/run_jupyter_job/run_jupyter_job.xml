@@ -1,10 +1,10 @@
-<tool id="run_jupyter_job" name="Run long running jupyterlab script" version="0.0.1" profile="21.05">
+<tool id="run_jupyter_job" name="Run long running jupyterlab script" tool_type="interactive" version="0.0.1" profile="21.05">
     <description>inside a Docker container</description>
     <requirements>
         <container type="docker">docker.io/anupkumar/execute_python_script:min_docker</container>
     </requirements>
-    <command detect_errors='exit_code'><![CDATA[
-        python sample_script.py
+    <command detect_errors="aggressive"><![CDATA[
+        python '$__tool_directory__/sample_script.py'
 ]]>
     </command>
     <inputs>
