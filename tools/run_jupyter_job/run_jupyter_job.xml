@@ -5,7 +5,7 @@
     </requirements>
     <entry_points>
         <entry_point name="Run jupyter script" requires_domain="true">
-	    <port>8888</port>
+	    <port>9999</port>
 	</entry_point>
     </entry_points>
     <command detect_errors="aggressive"><![CDATA[
