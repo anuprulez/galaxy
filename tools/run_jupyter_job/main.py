@@ -7,14 +7,12 @@ import os
 import subprocess
 
 import h5py
-
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-
-import tensorflow as tf
 import yaml
 from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
 
+
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 SKLEARN_MODELS = [
     "sklearn.ensemble",
@@ -44,6 +42,12 @@ DATAFRAME = [
     "pandas.core.frame.DataFrame"
 ]
 
+SCALAR_TYPES = [
+    "int",
+    "float",
+    "str"
+]
+
 
 def read_loaded_file(p_loaded_file, m_file, a_file):
     global_vars = dict()
@@ -62,6 +66,7 @@ def save_sklearn_model(obj, output_file):
 
 
 def save_tf_model(obj, output_file):
+    import tensorflow as tf
     curr_path = os.path.abspath(os.getcwd())
     tf_new_path = "{}/{}".format(curr_path, "model")
     if not os.path.exists(tf_new_path):
@@ -74,7 +79,7 @@ def save_tf_model(obj, output_file):
     subprocess.run(python_shell_script, shell=True, check=True)
 
 
-def save_array(payload, a_file):
+def save_primitives(payload, a_file):
     hf_file = h5py.File(a_file, "w")
     for key in payload:
         try:
@@ -92,7 +97,7 @@ def save_dataframe(payload, a_file):
 
 def check_vars(var_dict, m_file, a_file):
     if var_dict is not None:
-        arr_payload = dict()
+        primitive_payload = dict()
         dataframe_payload = dict()
         for key in var_dict:
             obj = var_dict[key]
@@ -105,12 +110,15 @@ def check_vars(var_dict, m_file, a_file):
                 save_sklearn_model(obj, m_file)
             # save arrays and lists
             elif len([item for item in ARRAYS if item in obj_class]) > 0:
-                if key not in arr_payload:
-                    arr_payload[key] = obj
+                if key not in primitive_payload:
+                    primitive_payload[key] = obj
             elif len([item for item in DATAFRAME if item in obj_class]) > 0:
                 if key not in dataframe_payload:
                     dataframe_payload[key] = obj
-        save_array(arr_payload, a_file)
+            elif len([item for item in SCALAR_TYPES if item in obj_class]) > 0:
+                if key not in primitive_payload:
+                    primitive_payload[key] = obj
+        save_primitives(primitive_payload, a_file)
         save_dataframe(dataframe_payload, a_file)
 
 
