@@ -1,7 +1,7 @@
 <tool id="run_jupyter_job" name="Run long running jupyterlab script" tool_type="interactive" version="0.0.1" profile="21.05">
     <description>inside a Docker container</description>
     <requirements>
-        <container type="docker">docker.io/anupkumar/execute_python_script:run_dynamic_job</container>
+        <container type="docker">docker.io/anupkumar/docker-ml-jupyterlab:galaxy-integration-0.1</container>
     </requirements>
     <entry_points>
         <entry_point name="Run jupyter script" requires_domain="true">
@@ -9,7 +9,12 @@
 	</entry_point>
     </entry_points>
     <command detect_errors="aggressive"><![CDATA[
-	    python '${__tool_directory__}/main.py' --loaded_file '$select_file' --output_model '$outfile_output_model' --output_array '$outfile_output_arrays'
+	    python '${__tool_directory__}/main.py'
+	        --loaded_file '$select_file'
+                --working_dir `pwd`
+		--output_model '$outfile_output_model'
+		--output_array '$outfile_output_arrays'
+		--output_zip '$outfile_output_zip'
 ]]>
     </command>
     <inputs>
@@ -18,6 +23,7 @@
     <outputs>
         <data format="onnx" name="outfile_output_model" label="Saved model"></data>
         <data format="h5" name="outfile_output_arrays" label="Saved arrays"></data>
+        <data format="zip" name="outfile_output_zip" label="Zipped files"></data>
     </outputs>
     <tests>
         <test expect_num_outputs="2">
