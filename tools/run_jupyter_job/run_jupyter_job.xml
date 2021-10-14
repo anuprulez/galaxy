@@ -1,4 +1,4 @@
-<tool id="run_jupyter_job" name="Run long running jupyterlab script" tool_type="interactive" version="0.0.1" profile="21.05">
+<tool id="run_jupyter_job" name="Run long running jupyterlab script" tool_type="interactive" hidden="true" version="0.0.1" profile="21.05">
     <description>inside a Docker container</description>
     <requirements>
         <container type="docker">docker.io/anupkumar/docker-ml-jupyterlab:galaxy-integration-0.1</container>
@@ -11,10 +11,10 @@
     <command detect_errors="aggressive"><![CDATA[
 	    python '${__tool_directory__}/main.py'
 	        --loaded_file '$select_file'
-                --working_dir `pwd`
-		--output_model '$outfile_output_model'
-		--output_array '$outfile_output_arrays'
-		--output_zip '$outfile_output_zip'
+            --working_dir `pwd`
+		    --output_model '$outfile_output_model'
+		    --output_array '$outfile_output_arrays'
+		    --output_zip '$outfile_output_zip'
 ]]>
     </command>
     <inputs>
