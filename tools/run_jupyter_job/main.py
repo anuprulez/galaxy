@@ -1,4 +1,5 @@
 import argparse
+import json
 import os
 import requests
 import subprocess
@@ -48,12 +49,14 @@ SCALAR_TYPES = [
 
 
 def download_files_update_paths(d_paths, code_file, w_dir):
-    #local_dir = os.path.join(os.getcwd(), download_local, 'tool_recommendation_model.hdf5')
+    paths_dict = json.loads(open(d_paths, "r").read())
     # read model from remote
     new_paths_dict = dict()
-    for d_p in d_paths:
-        remote_file = requests.get(d_paths[d_p])
+    for d_p in paths_dict:
+        print(paths_dict[d_p])
+        remote_file = requests.get(paths_dict[d_p])
         new_path = w_dir + os.path.basename(d_p)
+        print(new_path)
         # save model to a local directory
         with open(new_path, 'wb') as model_file:
             model_file.write(remote_file.content)
