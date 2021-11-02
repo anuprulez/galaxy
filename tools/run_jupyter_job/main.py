@@ -1,7 +1,3 @@
-"""
-Train and save machine learning models as ONNX file
-"""
-
 import argparse
 import os
 import subprocess
