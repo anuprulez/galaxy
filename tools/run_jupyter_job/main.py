@@ -48,38 +48,42 @@ SCALAR_TYPES = [
 ]
 
 
-def download_files_update_paths(d_paths, code_file, w_dir):
-    paths_dict = json.loads(open(d_paths, "r").read())
-    # read model from remote
-    new_paths_dict = dict()
-    for d_p in paths_dict:
-        print(paths_dict[d_p])
-        remote_file = requests.get(paths_dict[d_p])
-        new_path = w_dir + os.path.basename(d_p)
-        print(new_path)
-        # save model to a local directory
-        with open(new_path, 'wb') as model_file:
-            model_file.write(remote_file.content)
-            new_paths_dict[d_p] = new_path
-    print(new_paths_dict)
-    update_code_file = find_replace_paths(code_file, new_paths_dict)
-    return update_code_file
-
-
 def find_replace_paths(script_file, updated_data_dict):
     for item in updated_data_dict:
         g_path = updated_data_dict[item]
+        print(item, g_path, "inside replace")
         script_file = script_file.replace(item, g_path)
     return script_file
 
 
-def read_loaded_file(data_paths, p_loaded_file, m_file, a_file, w_dir, z_file):
-    updated_code_file = download_files_update_paths(data_paths, p_loaded_file, w_dir)
-    print(updated_code_file)
+def download_files_update_paths(d_paths, w_dir):
+    paths_dict = json.loads(open(d_paths, "r").read())
+    # read model from remote
+    new_paths_dict = dict()
+    for d_p in paths_dict:
+        remote_file = requests.get(paths_dict[d_p])
+        new_path = w_dir + "/" + os.path.basename(d_p)
+        # save model to a local directory
+        with open(new_path, 'wb') as model_file:
+            model_file.write(remote_file.content)
+            new_paths_dict[d_p] = new_path
+    return new_paths_dict
+
+
+def read_loaded_file(new_paths_dict, p_loaded_file, m_file, a_file, w_dir, z_file):
+    #new_paths_dict = download_files_update_paths(data_paths, w_dir)
     global_vars = dict()
-    input_file = yaml.safe_load(updated_code_file)
+    input_file = yaml.safe_load(p_loaded_file)
     code_string = open(input_file, "r").read()
-    compiled_code = compile(code_string, input_file, 'exec')
+    print(new_paths_dict)
+    print()
+    print(code_string)
+    re_code_string = find_replace_paths(code_string, new_paths_dict)
+    print()
+    print(re_code_string)
+    import sys
+    sys.exit()
+    compiled_code = compile(re_code_string, input_file, 'exec')
     exec(compiled_code, global_vars)
     check_vars(global_vars, m_file, a_file)
     zip_files(w_dir, z_file)
@@ -158,7 +162,7 @@ def check_vars(var_dict, m_file, a_file):
 if __name__ == "__main__":
 
     arg_parser = argparse.ArgumentParser()
-    arg_parser.add_argument("-dp", "--data_paths", required=True, help="")
+    arg_parser.add_argument("-dp", "--data_paths_file", required=True, help="")
     arg_parser.add_argument("-ldf", "--loaded_file", required=True, help="")
     arg_parser.add_argument("-wd", "--working_dir", required=True, help="")
     arg_parser.add_argument("-oz", "--output_zip", required=True, help="")
@@ -167,10 +171,12 @@ if __name__ == "__main__":
 
     # get argument values
     args = vars(arg_parser.parse_args())
-    data_paths = args["data_paths"]
+    print(args)
+    data_paths_file = args["data_paths_file"]
     loaded_file = args["loaded_file"]
     model_output_file = args["output_model"]
     array_output_file = args["output_array"]
     zip_output_file = args["output_zip"]
     working_dir = args["working_dir"]
-    read_loaded_file(data_paths, loaded_file, model_output_file, array_output_file, working_dir, zip_output_file)
+    new_paths_dict = download_files_update_paths(data_paths_file, working_dir)
+    read_loaded_file(new_paths_dict, loaded_file, model_output_file, array_output_file, working_dir, zip_output_file)

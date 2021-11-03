@@ -10,8 +10,8 @@
     </entry_points>
     <command detect_errors="aggressive"><![CDATA[
 	    python '${__tool_directory__}/main.py'
-	        --data_paths '$data_paths_dict'
-	        --loaded_file '$select_file'
+	    	--data_paths_file '$data_paths_dict_file'
+	    	--loaded_file '$select_file'
                 --working_dir `pwd`
 		--output_model '$outfile_output_model'
 		--output_array '$outfile_output_arrays'
@@ -19,7 +19,7 @@
 ]]>
     </command>
     <inputs>
-	<param name="data_paths_dict" type="data" label="Data paths" format="txt" />
+	<param name="data_paths_dict_file" type="data" label="Data paths" format="txt" />
         <param name="select_file" type="data" label="Load file" format="txt" />
     </inputs>
     <outputs>
