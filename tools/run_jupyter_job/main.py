@@ -67,6 +67,9 @@ def download_files_update_paths(d_paths, w_dir):
         with open(new_path, 'wb') as model_file:
             model_file.write(remote_file.content)
             new_paths_dict[d_p] = new_path
+        #import h5py
+        #h5_file = h5py.File(new_path, 'r')
+        #print(h5_file.keys())
     return new_paths_dict
 
 
@@ -81,10 +84,9 @@ def read_loaded_file(new_paths_dict, p_loaded_file, m_file, a_file, w_dir, z_fil
     re_code_string = find_replace_paths(code_string, new_paths_dict)
     print()
     print(re_code_string)
-    import sys
-    sys.exit()
     compiled_code = compile(re_code_string, input_file, 'exec')
     exec(compiled_code, global_vars)
+    print(global_vars)
     check_vars(global_vars, m_file, a_file)
     zip_files(w_dir, z_file)
 
@@ -171,7 +173,6 @@ if __name__ == "__main__":
 
     # get argument values
     args = vars(arg_parser.parse_args())
-    print(args)
     data_paths_file = args["data_paths_file"]
     loaded_file = args["loaded_file"]
     model_output_file = args["output_model"]
