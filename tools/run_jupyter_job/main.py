@@ -3,6 +3,7 @@ import json
 import os
 import requests
 import subprocess
+import warnings
 from zipfile import ZipFile
 
 import h5py
@@ -11,6 +12,7 @@ from skl2onnx import convert_sklearn
 from skl2onnx.common.data_types import FloatTensorType
 
 
+warnings.filterwarnings("ignore")
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 SKLEARN_MODELS = [
@@ -85,8 +87,12 @@ def read_loaded_file(new_paths_dict, p_loaded_file, m_file, a_file, w_dir, z_fil
     print()
     print(re_code_string)
     compiled_code = compile(re_code_string, input_file, 'exec')
+    #try:
     exec(compiled_code, global_vars)
-    print(global_vars)
+    #except Exception as e:
+    #print(e)
+    #pass
+    #print(global_vars)
     check_vars(global_vars, m_file, a_file)
     zip_files(w_dir, z_file)
 

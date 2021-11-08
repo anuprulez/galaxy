@@ -68,7 +68,7 @@ galaxy:
   # and use an arbitrary name here instead.
   # Please make sure that in the local development case you use https://localhost:8080 to access
   # your Galaxy. http://my-hostname:8080 will not work.
-  # galaxy_infrastructure_url: http://my-hostname:8080
+  galaxy_infrastructure_url: http://localhost:8080
 
   # The directory that will be prepended to relative paths in options
   # specifying other Galaxy config files (e.g. datatypes_config_file).
@@ -1564,7 +1564,7 @@ galaxy:
   # Admin section of the server, and will have access to create users,
   # groups, roles, libraries, and more.  For more information, see:
   # https://galaxyproject.org/admin/
-  #admin_users: null
+  #admin_users: anup.rulez@gmail.com
 
   # Force everyone to log in (disable anonymous access).
   #require_login: false
@@ -2016,7 +2016,7 @@ galaxy:
   # not be created by the user running the jobs (e.g. if the filesystem
   # is mounted read-only or the jobs are run by a different user than
   # the galaxy user).
-  #outputs_to_working_directory: false
+  outputs_to_working_directory: true
 
   # If your network filesystem's caching prevents the Galaxy server from
   # seeing the job's stdout and stderr files when it completes, you can
@@ -2044,7 +2044,7 @@ galaxy:
   # completion.  These bits include the job working directory, external
   # metadata temporary files, and DRM stdout and stderr files (if using
   # a DRM).  Possible values are: always, onsuccess, never
-  #cleanup_job: always
+  cleanup_job: never
 
   # When running DRMAA jobs as the Galaxy user
   # (https://docs.galaxyproject.org/en/master/admin/cluster.html#submitting-jobs-as-the-real-user)
@@ -2066,7 +2066,7 @@ galaxy:
   # this script is used transfer permissions back and forth between the
   # Galaxy user and the user that is running the job.
   # Example value 'sudo -E scripts/external_chown_script.py'
-  #external_chown_script: null
+  #external_chown_script: 'sudo -E scripts/external_chown_script.py'
 
   # When running DRMAA jobs as the Galaxy user
   # (https://docs.galaxyproject.org/en/master/admin/cluster.html#submitting-jobs-as-the-real-user)
