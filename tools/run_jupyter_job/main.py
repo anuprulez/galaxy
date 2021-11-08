@@ -53,7 +53,6 @@ SCALAR_TYPES = [
 def find_replace_paths(script_file, updated_data_dict):
     for item in updated_data_dict:
         g_path = updated_data_dict[item]
-        print(item, g_path, "inside replace")
         script_file = script_file.replace(item, g_path)
     return script_file
 
@@ -69,30 +68,16 @@ def download_files_update_paths(d_paths, w_dir):
         with open(new_path, 'wb') as model_file:
             model_file.write(remote_file.content)
             new_paths_dict[d_p] = new_path
-        #import h5py
-        #h5_file = h5py.File(new_path, 'r')
-        #print(h5_file.keys())
     return new_paths_dict
 
 
 def read_loaded_file(new_paths_dict, p_loaded_file, m_file, a_file, w_dir, z_file):
-    #new_paths_dict = download_files_update_paths(data_paths, w_dir)
     global_vars = dict()
     input_file = yaml.safe_load(p_loaded_file)
     code_string = open(input_file, "r").read()
-    print(new_paths_dict)
-    print()
-    print(code_string)
     re_code_string = find_replace_paths(code_string, new_paths_dict)
-    print()
-    print(re_code_string)
     compiled_code = compile(re_code_string, input_file, 'exec')
-    #try:
     exec(compiled_code, global_vars)
-    #except Exception as e:
-    #print(e)
-    #pass
-    #print(global_vars)
     check_vars(global_vars, m_file, a_file)
     zip_files(w_dir, z_file)
 
