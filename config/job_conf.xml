@@ -14,10 +14,6 @@
           <param id="docker_net">host</param>
           <param id="docker_auto_rm">true</param>
 	  <param id="require_container">true</param>
-	  <param id="docker_run_extra_arguments">&#45;&#45;add-host localhost:127.0.0.1</param>
-	  <!--<env id="GALAXY_MEMORY_MB">100000</env>
-	  <env id="GALAXY_SLOTS">10</env>
-	  <env id="GALAXY_MEMORY_MB_PER_SLOT">10000</env> -->
         </destination>
         <destination id="docker_dispatch" runner="dynamic">
             <param id="type">docker_dispatch</param>
