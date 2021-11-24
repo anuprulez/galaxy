@@ -1,4 +1,4 @@
-<tool id="run_jupyter_job" name="Run long running jupyterlab script" hidden="true" version="0.0.1" profile="21.05">
+<tool id="run_jupyter_job" name="Run long running jupyterlab script" hidden="false" version="0.0.1" profile="21.05">
     <description>inside a Docker container</description>
     <requirements>
         <container type="docker">docker.io/anupkumar/docker-ml-jupyterlab:galaxy-integration-0.1</container>
@@ -10,17 +10,19 @@
     </entry_points> -->
     <command detect_errors="aggressive"><![CDATA[
 	    python '${__tool_directory__}/main.py'
-	    	--data_paths_file '$data_paths_dict_file'
+	    	--ml_paths '$ml_h5_dataset_paths'
 	    	--loaded_file '$select_file'
                 --working_dir `pwd`
 		--output_model '$outfile_output_model'
 		--output_array '$outfile_output_arrays'
 		--output_zip '$outfile_output_zip'
+		--ml_h5_files '$ml_h5_datasets'
 ]]>
     </command>
-    <inputs>
-	<param name="data_paths_dict_file" type="data" label="Data paths" format="txt" />
-        <param name="select_file" type="data" label="Load file" format="txt" />
+    <inputs>i
+	<param name="ml_h5_dataset_paths" type="text" label="Data paths" />
+	<param name="select_file" type="data" label="Load file" format="txt" />
+	<param name="ml_h5_datasets" type="data" label="Input h5 dataset" format="h5" multiple="true" />
     </inputs>
     <outputs>
         <data format="onnx" name="outfile_output_model" label="Saved model"></data>
