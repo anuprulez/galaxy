@@ -15,9 +15,9 @@
 ]]>
     </command>
     <inputs>i
-	<param name="ml_h5_dataset_paths" type="text" label="Data paths" />
+	<param name="ml_h5_dataset_paths" type="text" label="Data paths" optional="true" />
 	<param name="select_file" type="data" label="Load file" format="txt" />
-	<param name="ml_h5_datasets" type="data" label="Input h5 dataset" format="h5" multiple="true" />
+	<param name="ml_h5_datasets" type="data" label="Input h5 dataset" format="h5" multiple="true" optional="true" />
     </inputs>
     <outputs>
         <data format="onnx" name="outfile_output_model" label="Saved model"></data>

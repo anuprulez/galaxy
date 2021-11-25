@@ -58,6 +58,8 @@ def find_replace_paths(script_file, updated_data_dict):
 
 
 def update_ml_files_paths(old_file_paths, new_file_paths):
+    if old_file_paths == "" or old_file_paths == None or new_file_paths == "" or new_file_paths == None:
+        return dict()
     o_files = old_file_paths.split(",")
     n_files = new_file_paths.split(",")
     new_paths_dict = dict()
