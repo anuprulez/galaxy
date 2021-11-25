@@ -66,20 +66,6 @@ def update_ml_files_paths(old_file_paths, new_file_paths):
     return new_paths_dict
 
 
-def download_files_update_paths(d_paths, w_dir):
-    paths_dict = json.loads(open(d_paths, "r").read())
-    # read model from remote
-    new_paths_dict = dict()
-    for d_p in paths_dict:
-        remote_file = requests.get(paths_dict[d_p])
-        new_path = w_dir + "/" + os.path.basename(d_p)
-        # save model to a local directory
-        with open(new_path, 'wb') as model_file:
-            model_file.write(remote_file.content)
-            new_paths_dict[d_p] = new_path
-    return new_paths_dict
-
-
 def read_loaded_file(new_paths_dict, p_loaded_file, m_file, a_file, w_dir, z_file):
     global_vars = dict()
     input_file = yaml.safe_load(p_loaded_file)
