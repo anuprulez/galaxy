@@ -26,7 +26,9 @@ SKLEARN_MODELS = [
 TF_MODELS = [
     "tensorflow.python.keras.engine.training.Model",
     "tensorflow.python.keras.engine.sequential.Sequential",
+    "tensorflow.python.keras.engine.functional.Functional",
     "tensorflow.python.keras.layers",
+    "keras.engine.functional.Functional",
     "keras.engine.sequential.Sequential",
     "keras.engine.training.Model",
     "keras.layers"
