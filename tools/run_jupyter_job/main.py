@@ -1,7 +1,5 @@
 import argparse
-import json
 import os
-import requests
 import subprocess
 import warnings
 from zipfile import ZipFile
@@ -58,7 +56,7 @@ def find_replace_paths(script_file, updated_data_dict):
 
 
 def update_ml_files_paths(old_file_paths, new_file_paths):
-    if old_file_paths == "" or old_file_paths == None or new_file_paths == "" or new_file_paths == None:
+    if old_file_paths == "" or old_file_paths is None or new_file_paths == "" or new_file_paths is None:
         return dict()
     o_files = old_file_paths.split(",")
     n_files = new_file_paths.split(",")
@@ -167,6 +165,6 @@ if __name__ == "__main__":
     array_output_file = args["output_array"]
     zip_output_file = args["output_zip"]
     working_dir = args["working_dir"]
-    ml_h5_files = args["ml_h5_files"] 
+    ml_h5_files = args["ml_h5_files"]
     new_paths_dict = update_ml_files_paths(ml_paths, ml_h5_files)
     read_loaded_file(new_paths_dict, loaded_file, model_output_file, array_output_file, working_dir, zip_output_file)
