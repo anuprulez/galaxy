@@ -20,7 +20,7 @@
     </inputs>
     <outputs>
         <data format="h5" name="outfile_output_arrays" label="Saved arrays"></data>
-        <data format="zip" name="outfile_output_zip" label="Zipped files"></data>>
+        <data format="zip" name="outfile_output_zip" label="Zipped files"></data>
         <collection name="onnx_models" type="list" label="Trained models">
 	        <discover_datasets format="onnx" pattern="__name__" visible="false" directory="model_outputs" />
         </collection>

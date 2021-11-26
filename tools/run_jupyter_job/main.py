@@ -103,7 +103,6 @@ def save_sklearn_model(w_dir, key, obj):
 
 def save_tf_model(w_dir, key, obj):
     import tensorflow as tf
-    import tf2onnx
     tf_file_key = "tf_model_{}".format(key)
     tf_model_path = "{}/{}".format(w_dir, tf_file_key)
     if not os.path.exists(tf_model_path):
@@ -113,7 +112,7 @@ def save_tf_model(w_dir, key, obj):
     # save model as ONNX
     tf_onnx_model_p = create_model_path(w_dir, key)
     # OPSET level defines a level of tensorflow operations supported by ONNX
-    python_shell_script = "python -m tf2onnx.convert --saved-model " + tf_model_path +  " --output " + tf_onnx_model_p + " --opset 15 "
+    python_shell_script = "python -m tf2onnx.convert --saved-model " + tf_model_path + " --output " + tf_onnx_model_p + " --opset 15 "
     # convert tf/keras model to ONNX and save it to output file
     subprocess.run(python_shell_script, shell=True, check=True)
 
