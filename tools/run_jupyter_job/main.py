@@ -95,17 +95,21 @@ def save_sklearn_model(obj, output_file):
 def save_tf_model(key, obj, output_file):
     import tensorflow as tf
     curr_path = os.path.abspath(os.getcwd())
-    print(curr_path, "model_{}".format(key))
-    tf_new_path = "{}/{}".format(curr_path, "model_{}".format(key))
-    if not os.path.exists(tf_new_path):
-        os.makedirs(tf_new_path)
+    tf_file_key = "tf_model_{}".format(key)
+    #print(curr_path, tf_file_key)
+    tf_model_path = "{}/{}".format(curr_path, tf_file_key)
+    if not os.path.exists(tf_model_path):
+        os.makedirs(tf_model_path)
     # save model as tf model
-    tf.saved_model.save(obj, tf_new_path)
-    new_name = "model_{}.onnx".format(key)
-    new_path = curr_path + "/" + new_name
-    print(new_path)
+    tf.saved_model.save(obj, tf_model_path)
+    # save model as ONNX
+    onnx_path = curr_path + "/outputs"
+    if not os.path.exists(onnx_path):
+        os.makedirs(onnx_path)
+    onnx_model_path = curr_path + "/outputs/" + "onnx_model_{}.onnx".format(key)
+    print(onnx_model_path)
     # OPSET level defines a level of tensorflow operations supported by ONNX
-    python_shell_script = "python -m tf2onnx.convert --saved-model " + tf_new_path +  " --output " + new_path + " --opset 15 "
+    python_shell_script = "python -m tf2onnx.convert --saved-model " + tf_model_path +  " --output " + onnx_model_path + " --opset 15 "
     # convert tf/keras model to ONNX and save it to output file
     subprocess.run(python_shell_script, shell=True, check=True)
 

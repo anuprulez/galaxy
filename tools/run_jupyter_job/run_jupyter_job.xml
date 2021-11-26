@@ -24,7 +24,7 @@
         <data format="h5" name="outfile_output_arrays" label="Saved arrays"></data>
         <data format="zip" name="outfile_output_zip" label="Zipped files"></data>>
         <collection name="onnx_models" type="list" label="Trained models">
-            <discover_datasets pattern="model_^.onnx" ext="onnx" visible="true" directory="outputs" />
+            <discover_datasets pattern="onnx_model_^.onnx" match_relative_path="true" format="onnx" visible="true" directory="outputs" />
         </collection>
     </outputs>
     <tests>
