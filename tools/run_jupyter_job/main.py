@@ -103,10 +103,10 @@ def save_tf_model(key, obj, output_file):
     # save model as tf model
     tf.saved_model.save(obj, tf_model_path)
     # save model as ONNX
-    onnx_path = curr_path + "/outputs"
+    onnx_path = curr_path + "/model_outputs"
     if not os.path.exists(onnx_path):
         os.makedirs(onnx_path)
-    onnx_model_path = curr_path + "/outputs/" + "onnx_model_{}.onnx".format(key)
+    onnx_model_path = curr_path + "/model_outputs/" + "onnx_model_{}.onnx".format(key)
     print(onnx_model_path)
     # OPSET level defines a level of tensorflow operations supported by ONNX
     python_shell_script = "python -m tf2onnx.convert --saved-model " + tf_model_path +  " --output " + onnx_model_path + " --opset 15 "

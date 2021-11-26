@@ -20,11 +20,11 @@
 	<param name="ml_h5_datasets" type="data" label="Input h5 dataset" format="h5" multiple="true" optional="true" />
     </inputs>
     <outputs>
-        <data format="onnx" name="outfile_output_model" label="Saved model"></data>
+	<!--<data format="onnx" name="outfile_output_model" label="Saved model"></data>-->
         <data format="h5" name="outfile_output_arrays" label="Saved arrays"></data>
         <data format="zip" name="outfile_output_zip" label="Zipped files"></data>>
         <collection name="onnx_models" type="list" label="Trained models">
-            <discover_datasets pattern="onnx_model_^.onnx" match_relative_path="true" format="onnx" visible="true" directory="outputs" />
+	    <discover_datasets format="onnx" pattern="__name__" visible="true" directory="model_outputs" />
         </collection>
     </outputs>
     <tests>
