@@ -22,7 +22,7 @@
         <data format="h5" name="outfile_output_arrays" label="Saved arrays"></data>
         <data format="zip" name="outfile_output_zip" label="Zipped files"></data>>
         <collection name="onnx_models" type="list" label="Trained models">
-	    <discover_datasets format="onnx" pattern="__name__" visible="true" directory="model_outputs" />
+	        <discover_datasets format="onnx" pattern="__name__" visible="false" directory="model_outputs" />
         </collection>
     </outputs>
     <tests>
@@ -45,6 +45,12 @@
                     <has_h5_keys keys="X,X_test,X_train,loss,y,y_test,y_train" />
                 </assert_contents>
             </output>
+            <output_collection name="onnx_models" type="list">
+                <element name="tf-script-model.onnx" file="tf-script-model.onnx"  ftype="onnx" compare="sim_size" delta="100" />
+            </output_collection>
+            <output_collection name="onnx_models" type="list">
+                <element name="scikit-script-model.onnx" file="scikit-script-model.onnx"  ftype="onnx" compare="sim_size" delta="50" />
+            </output_collection>
         </test>
     </tests>
     <help>
