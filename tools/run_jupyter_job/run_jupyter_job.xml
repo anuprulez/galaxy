@@ -22,7 +22,10 @@
     <outputs>
         <data format="onnx" name="outfile_output_model" label="Saved model"></data>
         <data format="h5" name="outfile_output_arrays" label="Saved arrays"></data>
-        <data format="zip" name="outfile_output_zip" label="Zipped files"></data>
+        <data format="zip" name="outfile_output_zip" label="Zipped files"></data>>
+        <collection name="onnx_models" type="list" label="Trained models">
+            <discover_datasets pattern="model_^.onnx" ext="onnx" visible="true" directory="outputs" />
+        </collection>
     </outputs>
     <tests>
         <test expect_num_outputs="3">

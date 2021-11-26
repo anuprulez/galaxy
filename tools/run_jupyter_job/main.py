@@ -92,16 +92,20 @@ def save_sklearn_model(obj, output_file):
         f.write(onx.SerializeToString())
 
 
-def save_tf_model(obj, output_file):
+def save_tf_model(key, obj, output_file):
     import tensorflow as tf
     curr_path = os.path.abspath(os.getcwd())
-    tf_new_path = "{}/{}".format(curr_path, "model")
+    print(curr_path, "model_{}".format(key))
+    tf_new_path = "{}/{}".format(curr_path, "model_{}".format(key))
     if not os.path.exists(tf_new_path):
         os.makedirs(tf_new_path)
     # save model as tf model
     tf.saved_model.save(obj, tf_new_path)
+    new_name = "model_{}.onnx".format(key)
+    new_path = curr_path + "/" + new_name
+    print(new_path)
     # OPSET level defines a level of tensorflow operations supported by ONNX
-    python_shell_script = "python -m tf2onnx.convert --saved-model " + tf_new_path +  " --output " + output_file + " --opset 15 "
+    python_shell_script = "python -m tf2onnx.convert --saved-model " + tf_new_path +  " --output " + new_path + " --opset 15 "
     # convert tf/keras model to ONNX and save it to output file
     subprocess.run(python_shell_script, shell=True, check=True)
 
@@ -131,7 +135,7 @@ def check_vars(var_dict, m_file, a_file):
             obj_class = str(obj.__class__)
             # save tf model
             if len([item for item in TF_MODELS if item in obj_class]) > 0:
-                save_tf_model(obj, m_file)
+                save_tf_model(key, obj, m_file)
             # save scikit-learn model
             elif len([item for item in SKLEARN_MODELS if item in obj_class]) > 0:
                 save_sklearn_model(obj, m_file)
