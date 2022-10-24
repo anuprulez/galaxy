@@ -118,6 +118,7 @@
   </section>
   <section id="plots" name="Graph/Display Data">
     <tool file="maf/vcf_to_maf_customtrack.xml" />
+    <tool file="interactive/interactivetool_ml_jupyter_notebook.xml" />
   </section>
   <section id="hgv" name="Phenotype Association">
     <tool file="evolution/codingSnps.xml" />
