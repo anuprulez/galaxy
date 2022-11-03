@@ -1,6 +1,9 @@
-<tool id="interactive_tool_ml_jupyter_notebook" tool_type="interactive" name="GPU enabled Interactive Jupyter Notebook for Machine Learning" version="0.1" profile="22.01">
+<tool id="interactive_tool_ml_jupyter_notebook" tool_type="interactive" name="GPU enabled Interactive Jupyter Notebook for Machine Learning" version="@VERSION@" profile="22.01">
+    <macros>
+        <token name="@VERSION@">0.1</token>
+    </macros>
     <requirements>
-        <container type="docker">docker.io/anupkumar/docker-ml-jupyterlab:galaxy-integration-cpu-0.1</container>
+        <container type="docker">docker.io/anupkumar/docker-ml-jupyterlab:galaxy-integration-cpu-@VERSION@</container>
     </requirements>
     <entry_points>
         <entry_point name="GPU enabled Interactive Jupyter Notebook for Machine Learning" requires_domain="True">
@@ -77,7 +80,6 @@
             </when>
         </conditional>
         <param name="input" type="data" optional="true" label="Include data into the environment"/>
-
     </inputs>
     <outputs>
         <data name="jupyter_notebook" format="ipynb" label="Executed Notebook" />
