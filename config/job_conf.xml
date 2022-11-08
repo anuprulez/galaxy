@@ -21,6 +21,7 @@
             <param id="docker_auto_rm">true</param>
             <param id="require_container">true</param>
             <param id="docker_set_user"></param>
+            <param id="docker_run_extra_arguments">&#45;&#45;add-host localhost:127.0.0.1</param>
             <!--<param id="docker_run_extra_arguments">&#45;&#45;gpus all</param> -->
             <!-- InteractiveTools do need real hostnames or URLs to work - simply specifying IPs will not work.
                If you develop interactive tools on your 'localhost' and don't have a proper domain name
