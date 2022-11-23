@@ -19,24 +19,93 @@
         <environment_variable name="DISABLE_AUTH">true</environment_variable>
         <environment_variable name="API_KEY" inject="api_key" />
     </environment_variables>
+    <configfiles>
+        <inputs name="inputs" filename="galaxy_inputs.json" data_style="staging_path_and_source_path"/>
+        <configfile name="staging_script" filename="staging_script.py"><![CDATA[
+import json, os, shutil
+import os.path
+galaxy_inputs = "galaxy_inputs.json"
+galaxy_inputs_raw = "galaxy_inputs_raw.json"
+base_staging_path = "jupyter"
+base_data_staging_path = "galaxy_inputs"
+data_staging_path = os.path.join(base_staging_path, base_data_staging_path)
+os.makedirs(data_staging_path, exist_ok=True)
+shutil.copyfile(galaxy_inputs, os.path.join(data_staging_path, galaxy_inputs_raw))
+galaxy_input_dict = {}
+for user_input in json.load(open(galaxy_inputs, "r")).get("user_inputs", []):
+    input_values = user_input['input_type']['input_value']
+    input_name = user_input["input_name"]
+    assert input_name not in galaxy_input_dict, ValueError("Each name can only be used once, but a duplicate was found: %s" % (input_name))
+    if 'dataset' in user_input['input_type']['input_type_selector']:
+        input_values2 = []
+        if not isinstance(input_values, list):
+            input_values = [input_values]
+        for input_value_dict in input_values:
+            path, filename = os.path.split(input_value_dict['staging_path'])
+            input_value_dict2 = {"path": os.path.join(base_data_staging_path, input_name, path, filename), "metadata_files": []}
+            ## TODO: enable passing in all metadata values; ideally just handed off from original json creation
+            path = os.path.join(data_staging_path, input_name, path)
+            os.makedirs(path, exist_ok=True)
+            try:
+                os.symlink(input_value_dict['source_path'], os.path.join(path, filename))
+            except FileExistsError:
+                pass
+            for metadata_value_dict in input_value_dict['metadata_files']:
+                path, filename = os.path.split(metadata_value_dict['staging_path'])
+                input_value_dict2["metadata_files"].append(os.path.join(base_data_staging_path, input_name, path, filename))
+                path = os.path.join(data_staging_path, input_name, path)
+                os.makedirs(path, exist_ok=True)
+                try:
+                    os.symlink(metadata_value_dict['source_path'], os.path.join(path, filename))
+                except FileExistsError:
+                    pass
+            input_values2.append(input_value_dict2)
+        input_values = input_values2
+    galaxy_input_dict[input_name] = input_values
+with open(os.path.join(data_staging_path, galaxy_inputs), "w") as fh:
+    json.dump(galaxy_input_dict, fh)
+]]>
+        </configfile>
+        <configfile name="galaxy_input_startup_script"><![CDATA[
+import json, os
+from galaxy_ie_helpers import get
+from galaxy_ie_helpers import put
+from galaxy_ie_helpers import get_galaxy_connection
+HISTORY_ID = os.environ.get('HISTORY_ID', None)
+try:
+    GALAXY_INPUTS = json.load(open(os.path.join(os.environ.get("GALAXY_WORKING_DIR", ""), "jupyter", "galaxy_inputs", "galaxy_inputs.json")))
+except FileNotFoundError:
+    GALAXY_INPUTS = {}
+        ]]>
+    </configfile>
+    </configfiles>
+    
     <command><![CDATA[
+        python staging_script.py &&
         export GALAXY_WORKING_DIR=`pwd` &&
         export HOME=/home/\$NB_USER/ &&
         export PATH=/home/\$NB_USER/.local/bin:\$PATH &&
+        cp '${galaxy_input_startup_script}' /home/jovyan/.ipython/profile_default/startup/00-load.py &&
         cp -r /home/\$NB_USER/* ./ &&
+        #set $output_notebook_name = 'ipython_galaxy_notebook.ipynb'
         #if $mode.mode_select == 'scratch':
             jupyter lab --no-browser --NotebookApp.shutdown_button=True
         #else:
-            #set $noteboook_name = re.sub('[^\w\-\.\s]', '_', str($mode.ipynb.element_identifier))
-            cp '$mode.ipynb' './${noteboook_name}.ipynb' &&
-            jupyter trust './${noteboook_name}.ipynb' &&
-            #if $mode.run_it:
-                jupyter nbconvert --to notebook --execute --output ./ipython_galaxy_notebook.ipynb --allow-errors  ./*.ipynb &&
-                #set $noteboook_name = 'ipython_galaxy_notebook'
-            #else:
-                jupyter lab --no-browser --NotebookApp.shutdown_button=True &&
+            #import re
+            #set $cleaned_name = re.sub('[^\w\-\.]', '_', str($mode.ipynb.element_identifier))
+            #if not $cleaned_name.endswith(".ipynb"):
+                #set $cleaned_name = "%s.ipynb" % $cleaned_name
             #end if
-            cp './${noteboook_name}.ipynb' '$jupyter_notebook'
+            cp '$mode.ipynb' '${cleaned_name}' &&
+            jupyter trust '${cleaned_name}' &&
+            
+            #if $mode.run_it:
+                jupyter nbconvert --to notebook --execute --output '${output_notebook_name}' --allow-errors '${cleaned_name}'
+            #else:
+                #set $output_notebook_name = $cleaned_name
+                jupyter lab --no-browser --NotebookApp.shutdown_button=True
+            #end if
+            ##cp '${output_notebook_name}' '$jupyter_notebook'
         #end if
     ]]>
     </command>
@@ -50,14 +119,35 @@
             <when value="scratch"/>
             <when value="previous">
                 <param name="ipynb" type="data" format="ipynb" label="IPython Notebook"/>
-                <param name="run_it" type="boolean" truevalue="true" falsevalue="false" label="Execute notebook and return a new one."
-                    help="This option is useful in workflows when you just want to execute a notebook and not dive into the webfrontend."/>
+                <param name="run_it" type="boolean" truevalue="true" falsevalue="false" label="Execute notebook and return a new one." help="This option is useful in workflows when you just want to execute a notebook and not dive into the webfrontend."/>
             </when>
         </conditional>
-        <param name="input" type="data" optional="true" label="Include data into the environment"/>
+         <repeat name="user_inputs" title="User inputs">
+            <param name="input_name" type="text" value="" label="Name for parameter" optional="False" help="Required. ASCII letters and numbers only.">
+                <validator type="empty_field" message="Name is required"/>
+                <sanitizer>
+                    <valid initial="string.ascii_letters,string.digits"/>
+                </sanitizer>
+            </param>
+            <param name="description" type="text" label="Additional optional description" optional="true"/>
+            <conditional name="input_type">
+                <param name="input_type_selector" type="select" label="Choose the input type">
+                    <option value="dataset" selected="true">Dataset</option>
+                </param>
+                <when value="dataset">
+                    <param name="input_value" type="data" format="data" label="Select value" multiple="false" optional="false"/>
+                </when>
+            </conditional>
+        </repeat>
     </inputs>
     <outputs>
         <data name="jupyter_notebook" format="ipynb" label="Executed Notebook" />
+        <data name="output_dataset" format="data">
+            <discover_datasets pattern="__designation_and_ext__" directory="jupyter/outputs" visible="true" assign_primary_output="true"/>
+        </data>
+        <collection name="output_collection" type="list" label="GPU Jupyterlab output collection">
+            <discover_datasets pattern="__designation_and_ext__" directory="jupyter/outputs/collection" visible="false"/>
+        </collection>
     </outputs>
     <tests>
         <test expect_num_outputs="1">
