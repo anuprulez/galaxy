@@ -83,10 +83,21 @@ except FileNotFoundError:
     <command><![CDATA[
         python staging_script.py &&
         export GALAXY_WORKING_DIR=`pwd` &&
+        mkdir -p ./jupyter/outputs &&
+        mkdir -p ./jupyter/galaxy_inputs &&
+
         export HOME=/home/\$NB_USER/ &&
         export PATH=/home/\$NB_USER/.local/bin:\$PATH &&
-        cp '${galaxy_input_startup_script}' /home/jovyan/.ipython/profile_default/startup/00-load.py &&
-        cp -r /home/\$NB_USER/* ./ &&
+        cd ./jupyter/ &&
+        cp '${galaxy_input_startup_script}' /home/\$NB_USER/.ipython/profile_default/startup/02-load.py &&
+        cp -r /home/\$NB_USER/data ./ &&
+        cp -r /home/\$NB_USER/elyra ./ &&
+        cp -r /home/\$NB_USER/notebooks ./ &&
+        cp -r /home/\$NB_USER/usecases ./ &&
+        cp -r /home/\$NB_USER/home_page.ipynb ./ &&
+
+        chown -R \$NB_USER:users `pwd` /home/\$NB_USER/ &&
+        
         #set $output_notebook_name = 'ipython_galaxy_notebook.ipynb'
         #if $mode.mode_select == 'scratch':
             jupyter lab --no-browser --NotebookApp.shutdown_button=True
@@ -122,7 +133,7 @@ except FileNotFoundError:
                 <param name="run_it" type="boolean" truevalue="true" falsevalue="false" label="Execute notebook and return a new one." help="This option is useful in workflows when you just want to execute a notebook and not dive into the webfrontend."/>
             </when>
         </conditional>
-         <repeat name="user_inputs" title="User inputs">
+        <repeat name="user_inputs" title="User inputs">
             <param name="input_name" type="text" value="" label="Name for parameter" optional="False" help="Required. ASCII letters and numbers only.">
                 <validator type="empty_field" message="Name is required"/>
                 <sanitizer>
@@ -133,20 +144,101 @@ except FileNotFoundError:
             <conditional name="input_type">
                 <param name="input_type_selector" type="select" label="Choose the input type">
                     <option value="dataset" selected="true">Dataset</option>
+                    <option value="dataset_multiple">Multiple datasets</option>
+                    <option value="dataset_collection">Dataset collection</option>
+                    <option value="dataset_collection_list">Dataset collection (list)</option>
+                    <option value="dataset_collection_paired">Dataset collection (paired)</option>
+                    <option value="dataset_collection_list_paired">Dataset collection (list:paired)</option>
+                    <option value="text">Text</option>
+                    <option value="integer">Integer</option>
+                    <option value="float">Floating point</option>
+                    <option value="boolean">Boolean</option>
+                    <option value="color">Color selector</option>
+                    <option value="dataset_optional" selected="true">Optional Dataset</option>
+                    <option value="dataset_multiple_optional">Optional Multiple datasets</option>
+                    <option value="dataset_collection_optional">Optional Dataset collection</option>
+                    <option value="dataset_collection_list_optional">Optional Dataset collection (list)</option>
+                    <option value="dataset_collection_paired_optional">Optional Dataset collection (paired)</option>
+                    <option value="dataset_collection_list_paired_optional">Optional Dataset collection (list:paired)</option>
+                    <option value="text_optional">Optional Text</option>
+                    <option value="integer_optional">Optional Integer</option>
+                    <option value="float_optional">Optional Floating point</option>
+                    <option value="boolean_optional">Optional Boolean</option>
+                    <option value="color_optional">Optional Color selector</option>
                 </param>
                 <when value="dataset">
                     <param name="input_value" type="data" format="data" label="Select value" multiple="false" optional="false"/>
+                </when>
+                <when value="dataset_multiple">
+                    <param name="input_value" type="data" format="data" label="Select value" multiple="true" optional="false"/>
+                </when>
+                <when value="dataset_collection">
+                    <param name="input_value" type="data_collection" format="data" label="Select value" optional="false"/>
+                </when>
+                <when value="dataset_collection_list">
+                    <param name="input_value" type="data_collection" format="data" label="Select value" collection_type="list" optional="false"/>
+                </when>
+                <when value="dataset_collection_paired">
+                    <param name="input_value" type="data_collection" format="data" label="Select value" collection_type="paired" optional="false"/>
+                </when>
+                <when value="dataset_collection_list_paired">
+                    <param name="input_value" type="data_collection" format="data" label="Select value" collection_type="list:paired" optional="false"/>
+                </when>
+                <when value="text">
+                    <param name="input_value" type="text" value="" label="Select value" optional="false"/>
+                </when>
+                <when value="integer">
+                    <param name="input_value" type="integer" value="" label="Select value" optional="false"/>
+                </when>
+                <when value="float">
+                    <param name="input_value" type="float" value="" label="Select value" optional="false"/>
+                </when>
+                <when value="boolean">
+                    <param name="input_value" type="boolean" truevalue="true" falsevalue="false" label="Select value" optional="false"/>
+                </when>
+                <when value="color">
+                    <param name="input_value" type="color" label="Select value" optional="false"/>
+                </when>
+                <when value="dataset_optional">
+                    <param name="input_value" type="data" format="data" label="Select value" multiple="false" optional="true"/>
+                </when>
+                <when value="dataset_multiple_optional">
+                    <param name="input_value" type="data" format="data" label="Select value" multiple="true" optional="true"/>
+                </when>
+                <when value="dataset_collection_optional">
+                    <param name="input_value" type="data_collection" format="data" label="Select value" optional="true"/>
+                </when>
+                <when value="dataset_collection_list_optional">
+                    <param name="input_value" type="data_collection" format="data" label="Select value" collection_type="list" optional="true"/>
+                </when>
+                <when value="dataset_collection_paired_optional">
+                    <param name="input_value" type="data_collection" format="data" label="Select value" collection_type="paired" optional="true"/>
+                </when>
+                <when value="dataset_collection_list_paired_optional">
+                    <param name="input_value" type="data_collection" format="data" label="Select value" collection_type="list:paired" optional="true"/>
+                </when>
+                <when value="text_optional">
+                    <param name="input_value" type="text" value="" label="Select value" optional="true"/>
+                </when>
+                <when value="integer_optional">
+                    <param name="input_value" type="integer" value="" label="Select value" optional="true"/>
+                </when>
+                <when value="float_optional">
+                    <param name="input_value" type="float" value="" label="Select value" optional="true"/>
+                </when>
+                <when value="boolean_optional">
+                    <param name="input_value" type="boolean" truevalue="true" falsevalue="false" label="Select value" optional="true"/>
+                </when>
+                <when value="color_optional">
+                    <param name="input_value" type="color" label="Select value" optional="true"/>
                 </when>
             </conditional>
         </repeat>
     </inputs>
     <outputs>
         <data name="jupyter_notebook" format="ipynb" label="Executed Notebook" />
-        <data name="output_dataset" format="data">
-            <discover_datasets pattern="__designation_and_ext__" directory="jupyter/outputs" visible="true" assign_primary_output="true"/>
-        </data>
         <collection name="output_collection" type="list" label="GPU Jupyterlab output collection">
-            <discover_datasets pattern="__designation_and_ext__" directory="jupyter/outputs/collection" visible="false"/>
+            <discover_datasets pattern="__designation_and_ext__" directory="jupyter/outputs" visible="false"/>
         </collection>
     </outputs>
     <tests>
