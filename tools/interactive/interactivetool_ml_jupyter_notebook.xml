@@ -90,7 +90,6 @@ except FileNotFoundError:
         cp '${galaxy_input_startup_script}' /home/\$NB_USER/.ipython/profile_default/startup/02-load.py &&
         cd ./jupyter/ &&
 
-        #set $output_notebook_name = 'ipython_galaxy_notebook.ipynb'
         #if $mode.mode_select == 'scratch':
             cp -r /home/\$NB_USER/data ./ &&
             cp -r /home/\$NB_USER/elyra ./ &&
@@ -99,6 +98,7 @@ except FileNotFoundError:
             cp -r /home/\$NB_USER/home_page.ipynb ./ &&
             jupyter lab --no-browser --NotebookApp.shutdown_button=True
         #else:
+            #set $output_notebook_name = 'jupyterlab_notebook.ipynb'
             #import re
             #set $cleaned_name = re.sub('[^\w\-\.]', '_', str($mode.ipynb.element_identifier))
             #if not $cleaned_name.endswith(".ipynb"):
@@ -106,27 +106,25 @@ except FileNotFoundError:
             #end if
             cp '$mode.ipynb' '${cleaned_name}' &&
             jupyter trust '${cleaned_name}' &&
-            
+
             #if $mode.run_it:
                 jupyter nbconvert --to notebook --execute --output '${output_notebook_name}' --allow-errors '${cleaned_name}'
             #else:
                 #set $output_notebook_name = $cleaned_name
                 jupyter lab --no-browser --NotebookApp.shutdown_button=True
             #end if
-            ##cp '${output_notebook_name}' '$jupyter_notebook'
         #end if
     ]]>
     </command>
     <inputs>
-173: Executed Notebook
         <conditional name="mode">
-            <param name="mode_select" type="select" label="Do you already have a notebook?" help="If not, no problem we will provide you with a default one.">
+            <param name="mode_select" type="select" label="Do you already have a notebook?" help="Select a set of default notebooks or load an existing one.">
                 <option value="scratch">Start with default notebooks</option>
                 <option value="previous">Load an existing notebook</option>
             </param>
             <when value="scratch"/>
             <when value="previous">
-                <param name="ipynb" type="data" format="ipynb" label="IPython Notebook"/>
+                <param name="ipynb" type="data" format="ipynb" label="IPython Notebook" required="true"/>
                 <param name="run_it" type="boolean" truevalue="true" falsevalue="false" label="Execute notebook and return a new one." help="This option is useful in workflows when you just want to execute a notebook and not dive into the webfrontend."/>
             </when>
         </conditional>
@@ -233,8 +231,7 @@ except FileNotFoundError:
         </repeat>
     </inputs>
     <outputs>
-        <data name="jupyter_notebook" format="ipynb" label="Executed Notebook" />
-        <collection name="output_collection" type="list" label="GPU Jupyterlab output collection">
+        <collection name="output_collection" type="list" label="GPU Jupyterlab notebook output collection">
             <discover_datasets pattern="__designation_and_ext__" directory="jupyter/outputs" visible="false"/>
         </collection>
     </outputs>
@@ -243,7 +240,6 @@ except FileNotFoundError:
             <param name="mode" value="previous" />
             <param name="ipynb" value="test.ipynb" />
             <param name="run_it" value="true" />
-            <output name="jupyter_notebook" file="test.ipynb" ftype="ipynb"/>
         </test>
     </tests>
     <help><![CDATA[
