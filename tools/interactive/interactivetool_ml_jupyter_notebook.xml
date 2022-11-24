@@ -85,21 +85,18 @@ except FileNotFoundError:
         export GALAXY_WORKING_DIR=`pwd` &&
         mkdir -p ./jupyter/outputs &&
         mkdir -p ./jupyter/galaxy_inputs &&
-
         export HOME=/home/\$NB_USER/ &&
         export PATH=/home/\$NB_USER/.local/bin:\$PATH &&
-        cd ./jupyter/ &&
         cp '${galaxy_input_startup_script}' /home/\$NB_USER/.ipython/profile_default/startup/02-load.py &&
-        cp -r /home/\$NB_USER/data ./ &&
-        cp -r /home/\$NB_USER/elyra ./ &&
-        cp -r /home/\$NB_USER/notebooks ./ &&
-        cp -r /home/\$NB_USER/usecases ./ &&
-        cp -r /home/\$NB_USER/home_page.ipynb ./ &&
+        cd ./jupyter/ &&
 
-        chown -R \$NB_USER:users `pwd` /home/\$NB_USER/ &&
-        
         #set $output_notebook_name = 'ipython_galaxy_notebook.ipynb'
         #if $mode.mode_select == 'scratch':
+            cp -r /home/\$NB_USER/data ./ &&
+            cp -r /home/\$NB_USER/elyra ./ &&
+            cp -r /home/\$NB_USER/notebooks ./ &&
+            cp -r /home/\$NB_USER/usecases ./ &&
+            cp -r /home/\$NB_USER/home_page.ipynb ./ &&
             jupyter lab --no-browser --NotebookApp.shutdown_button=True
         #else:
             #import re
@@ -121,11 +118,11 @@ except FileNotFoundError:
     ]]>
     </command>
     <inputs>
-
+173: Executed Notebook
         <conditional name="mode">
             <param name="mode_select" type="select" label="Do you already have a notebook?" help="If not, no problem we will provide you with a default one.">
-                <option value="scratch">Start with a fresh notebook</option>
-                <option value="previous">Load a previous notebook</option>
+                <option value="scratch">Start with default notebooks</option>
+                <option value="previous">Load an existing notebook</option>
             </param>
             <when value="scratch"/>
             <when value="previous">
