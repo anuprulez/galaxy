@@ -231,12 +231,18 @@ except FileNotFoundError:
         </repeat>
     </inputs>
     <outputs>
-        <data name="jupyter_notebook" format="ipynb" label="Executed JupyTool Notebook"/>
-        <collection name="output_collection" type="list" label="GPU Jupyterlab notebook output collection">
+        <data name="jupyter_notebook" format="ipynb" label="Executed GPU JupyterLab Notebook"/>
+        <collection name="output_collection" type="list" label="GPU JupyterLab notebook output collection">
             <discover_datasets pattern="__designation_and_ext__" directory="jupyter/outputs" visible="false"/>
         </collection>
     </outputs>
     <tests>
+        <test expect_num_outputs="1">
+            <param name="mode" value="previous" />
+            <param name="ipynb" value="test.ipynb" />
+            <param name="run_it" value="true" />
+            <output name="jupyter_notebook" file="test.ipynb" ftype="ipynb"/>
+        </test>
     </tests>
     <help><![CDATA[
         JupyterLab is a next-generation web-based user interface for Project Jupyter. JupyterLab enables you to work with documents and activities such as Jupyter notebooks, text editors,
