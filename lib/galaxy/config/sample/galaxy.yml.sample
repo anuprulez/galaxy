@@ -19,27 +19,6 @@
 # Configuration for Gravity process manager.
 # ``uwsgi:`` section will be ignored if Galaxy is started via Gravity commands (e.g ``./run.sh``, ``galaxy`` or ``galaxyctl``).
 gravity:
-  gx_it_proxy:
-    enable: true
-    port: 4002
-
-galaxy:
-  interactivetools_enable: true
-  # outputs_to_working_directory will provide you with a better level of isolation. It is highly recommended to set
-  # this parameter with InteractiveTools.
-  outputs_to_working_directory: true
-  interactivetools_map: database/interactivetools_map.sqlite
-  # `galaxy_infrastructure_url` needs to be reachable from IT containers.
-  # For local development you can map arbitrary hostnames. See `job_conf.xml.interactivetools`
-  # for an example.
-  # In the local development case you should use the `http` protocol (e.g http://localhost:8080) to access
-  # your Galaxy, so saving notebooks doesn't fail due to invalid certificates.
-  galaxy_infrastructure_url: http://localhost:8080
-  # Do not set the following 2 options if you are using an upstream proxy server like nginx
-  interactivetools_upstream_proxy: false
-  interactivetools_proxy_host: localhost:4002
-
-gravity:
 
   # Specify Galaxy's root directory.
   # Gravity will attempt to find the root directory, but you can set the directory explicitly with this option.
@@ -222,6 +201,15 @@ galaxy:
   # default SQLite database, file_path, etc.). Defaults to `database/`
   # if running Galaxy from source or `<config_dir>/data` otherwise.
   #data_dir: null
+
+  # The directory containing custom templates for Galaxy, such as
+  # HTML/text email templates. Defaults to 'templates'. Default
+  # templates can be found in the Galaxy root under config/templates.
+  # These can be copied to <templates_dir> if you wish to customize
+  # them.
+  # The value of this option will be resolved with respect to
+  # <config_dir>.
+  #templates_dir: templates
 
   # Top level cache directory. Any other cache directories
   # (tool_cache_data_dir, template_cache_path, etc.) should be
@@ -1030,16 +1018,16 @@ galaxy:
   #aws_estimate: false
 
   # Enable InteractiveTools.
-  interactivetools_enable: true
+  #interactivetools_enable: false
 
   # Set this to false to redirect users of Interactive tools directly to
   # the Interactive tools proxy. `interactivetools_upstream_proxy`
   # should only be set to false in development.
-  interactivetools_upstream_proxy: false
+  #interactivetools_upstream_proxy: true
 
   # Hostname and port of Interactive tools proxy. It is assumed to be
   # hosted on the same hostname and port as Galaxy by default.
-  interactivetools_proxy_host: localhost:4002
+  #interactivetools_proxy_host: null
 
   # Base path for interactive tools running at a subpath without a
   # subdomain. Defaults to "/".
@@ -1048,7 +1036,7 @@ galaxy:
   # Map for interactivetool proxy.
   # The value of this option will be resolved with respect to
   # <data_dir>.
-  interactivetools_map: interactivetools_map.sqlite
+  #interactivetools_map: interactivetools_map.sqlite
 
   # Prefix to use in the formation of the subdomain or path for
   # interactive tools
@@ -1132,9 +1120,8 @@ galaxy:
   # file staging and Interactive Tool containers for communicating back
   # with Galaxy via the API.
   # If you plan to run Interactive Tools make sure the docker container
-  # can reach this URL. For more details see
-  # `job_conf.xml.interactivetools`.
-  galaxy_infrastructure_url: http://localhost:8080
+  # can reach this URL.
+  #galaxy_infrastructure_url: http://localhost:8080
 
   # If the above URL cannot be determined ahead of time in dynamic
   # environments but the port which should be used to access Galaxy can
@@ -2078,10 +2065,10 @@ galaxy:
   # process and notifies itself of new jobs via in-memory queues.  Jobs
   # are run locally on the system on which Galaxy is started.  Advanced
   # job running capabilities can be configured through the job
-  # configuration file.
+  # configuration file or the <job_config> option.
   # The value of this option will be resolved with respect to
   # <config_dir>.
-  #job_config_file: job_conf.xml
+  #job_config_file: job_conf.yml
 
   # Description of job running configuration, can be embedded into
   # Galaxy configuration or loaded from an additional file with the
@@ -2106,11 +2093,11 @@ galaxy:
 
   # When jobs fail due to job runner problems, Galaxy can be configured
   # to retry these or reroute the jobs to new destinations. Very fine
-  # control of this is available with resubmit declarations in
-  # job_conf.xml. For simple deployments of Galaxy though, the following
+  # control of this is available with resubmit declarations in the job
+  # config. For simple deployments of Galaxy though, the following
   # attribute can define resubmission conditions for all job
   # destinations. If any job destination defines even one resubmission
-  # condition explicitly in job_conf.xml - the condition described by
+  # condition explicitly in the job config - the condition described by
   # this option will not apply to that destination. For instance, the
   # condition: 'attempt < 3 and unknown_error and (time_running < 300 or
   # time_since_queued < 300)' would retry up to two times jobs that
@@ -2443,8 +2430,8 @@ galaxy:
   #    galaxy.set_job_metadata: galaxy.external
 
   # Offload long-running tasks to a Celery task queue. Activate this
-  # only if you have setup a Celery worker for Galaxy. For details, see
-  # https://docs.galaxyproject.org/en/master/admin/production.html
+  # only if you have setup a Celery worker for Galaxy in the gravity section.
+  # This is a beta feature that is actively being worked on.
   #enable_celery_tasks: false
 
   # Allow disabling pbkdf2 hashing of passwords for legacy situations.
