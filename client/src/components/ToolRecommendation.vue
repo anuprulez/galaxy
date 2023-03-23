@@ -86,7 +86,11 @@ export default {
             const duration = 750;
             const maxTextLength = 20;
             const svg = d3.select("#tool-recommendation").append("svg").attr("class", "tree-size").append("g");
-            const gElem = svg[0][0];
+            console.log(predictedTools);
+            console.log(svg);
+            console.log(d3);
+            // const gElem = svg[0][0];
+            const gElem = svg._groups[0][0];
             const svgElem = gElem.parentNode;
             const clientH = svgElem.clientHeight;
             const clientW = svgElem.clientWidth;
@@ -95,23 +99,37 @@ export default {
             svgElem.setAttribute("viewBox", -translateX + " 0 " + 0.5 * clientW + " " + clientH);
             svgElem.setAttribute("preserveAspectRatio", "xMidYMid meet");
 
-            const tree = d3.tree().size([clientH, clientW]);
-            const diagonal = d3.svg.diagonal().projection((d) => {
-                return [d.y, d.x];
-            });
+            //const tree = d3.tree().size([clientH, clientW]);
+            //const diagonal = d3.svg.diagonal().projection((d) => {
+            //    return [d.y, d.x];
+            // });
+            const diagonal = d3.linkHorizontal().x(d => d.y).y(d => d.x);
+            //console.log(diagonal);
+            
+            var treemap = d3.tree().size([clientH, clientW]);
+
+            // Assigns parent, children, height, depth
+            //root = d3.hierarchy(treeData, function(d) { return d.children; });
+            //root.x0 = height / 2;
+            //root.y0 = 0;
+
+            // Collapse after the second level
+            // root.children.forEach(collapse);
+            
+            root = d3.hierarchy(predictedTools, function(d) { return d.children; });
+            root.x0 = parseInt(clientH / 2);
+            root.y0 = 0;
+            
             const update = (source) => {
-                // Compute the new tree layout.
-                const nodes = tree.nodes(root).reverse();
-                const links = tree.links(nodes);
-                // Normalize for fixed-depth.
-                nodes.forEach((d) => {
-                    d.y = d.depth * (clientW / 10);
-                });
-                // Update the nodes
-                const node = svg.selectAll("g.node").data(nodes, (d) => {
-                    return d.id || (d.id = ++i);
-                });
-                // Enter any new nodes at the parent's previous position.
+                const treeData = treemap(root);
+                const nodes = treeData.descendants();
+                const links = treeData.descendants().slice(1);
+                const node = svg.selectAll('g.node')
+                    .data(nodes, function(d) {return d.id || (d.id = ++i); }); 
+
+                //nodes.children.forEach((d) => {
+                //    d.y = d.depth * (clientW / 10);
+                //});
                 const nodeEnter = node
                     .enter()
                     .append("g")
@@ -131,14 +149,15 @@ export default {
                         return d.children || d._children ? "end" : "start";
                     })
                     .text((d) => {
-                        const tName = d.name;
+                        console.log(d);
+                        const tName = d.data.name;
                         if (tName.length > maxTextLength) {
                             return tName.slice(0, maxTextLength) + "...";
                         }
-                        return d.name;
+                        return d.data.name;
                     });
                 nodeEnter.append("title").text((d) => {
-                    return d.children || d._children ? d.name : "Open tool - " + d.name;
+                    return d.children || d.parent ? d.data.name : "Open tool - " + d.data.name;
                 });
                 // Transition nodes to their new position.
                 const nodeUpdate = node
@@ -156,10 +175,15 @@ export default {
                         return "translate(" + source.y + "," + source.x + ")";
                     })
                     .remove();
-                // Update the links
+                    
+                //const link = svg.selectAll("path.link").data(links, (d) => {
+                //    return d.target.id;
+                //}); gElem.selectAll(".link")
+
                 const link = svg.selectAll("path.link").data(links, (d) => {
-                    return d.target.id;
+                    return d.data.id;
                 });
+
                 // Enter any new links at the parent's previous position.
                 link.enter()
                     .insert("path", "g")
@@ -180,12 +204,11 @@ export default {
                     })
                     .remove();
                 // Stash the old positions for transition.
-                nodes.forEach((d) => {
-                    d.x0 = d.x;
-                    d.y0 = d.y;
-                });
+                //nodes.children.forEach((d) => {
+                //    d.x0 = d.x;
+                //    d.y0 = d.y;
+                //});
             };
-            // Toggle children on click.
             const click = (d) => {
                 if (d.children) {
                     d._children = d.children;
@@ -207,9 +230,6 @@ export default {
                     d.children = null;
                 }
             };
-            root = predictedTools;
-            root.x0 = parseInt(clientH / 2);
-            root.y0 = 0;
             root.children.forEach(collapse);
             update(root);
         },
