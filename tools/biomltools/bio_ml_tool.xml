@@ -1,0 +1,62 @@
+<tool id="bio_ml_tool" name="ML inference using BioML" version="0.0.1" profile="22.01">
+    <description>inside a Docker container</description>
+    <requirements>
+        <container type="docker">docker.io/anupkumar/immune-checkpoint:latest</container>
+    </requirements>
+    <command><![CDATA[
+    cp /home/\$NB_USER/forest16.onnx `pwd` && python '$biom_script'
+]]>
+    </command>
+    <configfiles>
+        <configfile name="biom_script">
+            <![CDATA[        
+import os
+import argparse
+import numpy
+import onnxruntime as rt
+import pandas as pd
+
+
+data_test = pd.read_excel('$input_file', sheet_name='Test')
+y_test = pd.DataFrame(data_test, columns=["Response (1:Responder; 0:Non-responder)"])    
+rf16=["Cancer_Type2", "Albumin", "HED", "TMB", "FCNA", "BMI", "NLR", "Platelets", "HGB", "Stage (1:IV; 0:I-III)", "Age", "Drug (1:Combo; 0:PD1/PDL1orCTLA4)", "Chemo_before_IO (1:Yes; 0:No)","HLA_LOH", "MSI (1:Unstable; 0:Stable_Indeterminate)", "Sex (1:Male; 0:Female)"]
+x_test16 = pd.DataFrame(data_test, columns=rf16)
+sess = rt.InferenceSession(os.getcwd() + "/forest16.onnx")
+input_name = sess.get_inputs()[0].name
+label_name = sess.get_outputs()[0].name
+pred_onx = sess.run([label_name], {input_name: x_test16.astype(numpy.float32).values})[0]
+x_test16["Predictions"] = pred_onx
+x_test16.to_csv('$output_file', sep="\t", index=None)
+
+]]>
+        </configfile>
+    </configfiles>
+    <inputs>
+	<param name="input_file" type="data" label="Test data" format="xlsx" multiple="true" />
+    </inputs>
+    <outputs>
+        <data format="tabular" name="output_file" label="Predicted data"></data>
+    </outputs>
+    <tests>
+    </tests>
+    <help>
+        <![CDATA[
+**What it does**
+
+
+**Description**
+
+
+Predict using RF model inside a container.
+
+-----
+
+**Output file**
+
+Returns predicted data.
+
+        ]]>
+    </help>
+    <citations>
+    </citations>
+</tool>
