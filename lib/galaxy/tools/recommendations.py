@@ -119,11 +119,20 @@ class ToolRecommendations:
         """
         Compute tool predictions
         """
+        from litellm import completion
+        response = completion(
+            model="ollama/llama2", 
+            messages=[{ "content": "respond in 20 words. who are you?","role": "user"}], 
+            api_base="http://localhost:11434"
+        )
+        log.info("=========================== Ollama response ============================")
+        log.info(response)
         recommended_tools = {}
-        self.__collect_admin_preferences(trans.app.config.admin_tool_recommendations_path)
-        if self.model_ok is None:
-            self.__set_model(trans, remote_model_url)
-        recommended_tools = self.__compute_tool_prediction(trans, tool_sequence)
+        #self.__collect_admin_preferences(trans.app.config.admin_tool_recommendations_path)
+        #if self.model_ok is None:
+        #    self.__set_model(trans, remote_model_url)
+        recommended_tools = {} #self.__compute_tool_prediction(trans, tool_sequence)
+        
         return tool_sequence, recommended_tools
 
     def __set_model(self, trans, remote_model_url):

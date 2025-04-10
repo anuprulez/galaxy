@@ -86,10 +86,10 @@ gravity:
   gunicorn:
 
     # Enable Galaxy gunicorn server.
-    # enable: true
+    enable: true
 
     # The socket to bind. A string of the form: ``HOST``, ``HOST:PORT``, ``unix:PATH``, ``fd://FD``. An IP is a valid HOST.
-    # bind: localhost:8080
+    bind: localhost:8080
 
     # Controls the number of Galaxy application processes Gunicorn will spawn.
     # Increased web performance can be attained by increasing this value.
@@ -2944,15 +2944,15 @@ galaxy:
   # Allow the display of tool recommendations in workflow editor and
   # after tool execution. If it is enabled and set to true, please
   # enable 'tool_recommendation_model_path' as well
-  #enable_tool_recommendations: false
+  enable_tool_recommendations: true
 
   # Set remote path of the trained model (HDF5 file) for tool
   # recommendation.
-  #tool_recommendation_model_path: https://github.com/galaxyproject/galaxy-test-data/raw/master/tool_recommendation_model_v_0.2.hdf5
+  tool_recommendation_model_path: https://github.com/galaxyproject/galaxy-test-data/raw/master/tool_recommendation_model_v_0.2.hdf5
 
   # Set the number of predictions/recommendations to be made by the
   # model
-  #topk_recommendations: 20
+  topk_recommendations: 20
 
   # Set path to the additional tool preferences from Galaxy admins. It
   # has two blocks. One for listing deprecated tools which will be
