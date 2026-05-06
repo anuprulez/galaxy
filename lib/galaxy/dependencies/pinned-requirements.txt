@@ -137,6 +137,8 @@ keyring==25.7.0
 kombu==5.6.2
 lagom==2.7.7
 legacy-cgi==2.6.4 ; python_full_version >= '3.13'
+llama-index-core==0.14.21
+llama-index-embeddings-huggingface==0.7.0
 limits==5.8.0
 logfire==4.32.1
 logfire-api==4.32.1

@@ -48,6 +48,10 @@ pykube-ng==23.6.0
 # Synnefo / Pithos+ object store client
 kamaki
 
+# For GTN vector search and RAG
+llama-index-core
+llama-index-embeddings-huggingface
+
 # Onedata REST-based client for data access, required by the Onedata object store
 onedatafilerestclient
 
