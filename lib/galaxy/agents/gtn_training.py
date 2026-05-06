@@ -136,8 +136,6 @@ class GTNTrainingAgent(BaseGalaxyAgent):
                 log.warning(f"GTN vector search failed: {e}")
                 return json.dumps({"error": str(e)})
 
-        return agent
-
         '''@agent.tool
         async def get_tutorial_content(
             ctx: RunContext[GalaxyAgentDependencies],
