@@ -49,6 +49,9 @@ pykube-ng==23.6.0
 kamaki
 
 # For GTN vector search and RAG
+langchain
+langchain-openai
+langchain-community
 llama-index-core
 llama-index-embeddings-huggingface
 

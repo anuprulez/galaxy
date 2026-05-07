@@ -109,6 +109,7 @@ class GTNTrainingAgent(BaseGalaxyAgent):
             except (AttributeError, KeyError, TypeError) as e:
                 log.warning(f"GTN search failed: {e}")
                 return json.dumps({"error": str(e)})'''
+
             
         @agent.tool
         async def search_gtn_tutorial_vectors(
@@ -123,7 +124,7 @@ class GTNTrainingAgent(BaseGalaxyAgent):
             if not self.gtn_db:
                 return json.dumps({"error": "GTN database not available"})
             try:
-                results = self.gtn_db.search_vector(query=query, limit=limit)
+                results = self.gtn_db.search_vector_db(query=query, limit=10)
                 log.info(f"GTN search found {len(results)} results, vector search found {len(results)} results for query: '{query}'")
 
                 return json.dumps(

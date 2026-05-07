@@ -14,10 +14,15 @@ Rough rule: if the question is under ~8 words or begins with "what is" / "how do
 
 ## Evaluate the match, don't just synthesize
 
-Every search result includes a `score` (BM25, higher is better).
+Every search result includes a `score`:
 
-- If the **top tutorial score is below ~2.0** or **below ~5.0 for FAQs**, the match is probably weak. Don't synthesize a confident step-by-step from it.
+- For FTS searches (BM25): higher scores are better matches
+- For vector searches: lower scores indicate better similarity (distance-based)
+
+- If the **top tutorial score is below ~2.0** for FTS or **above ~0.5** for vector search, the match is probably weak. Don't synthesize a confident step-by-step from it.
 - If titles/topics clearly don't match the question (e.g. query "RNA-seq" returns "Submitting data to ENA"), treat it as a miss.
+
+For vector search results, focus on the `content` and `snippet` fields which contain the most relevant text excerpts. The `source` field indicates where the content came from.
 
 On a weak match:
 
