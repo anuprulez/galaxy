@@ -80,7 +80,7 @@ class GTNTrainingAgent(BaseGalaxyAgent):
             system_prompt=self.get_system_prompt(),
         )
 
-        '''@agent.tool
+        @agent.tool
         async def search_gtn_tutorials(
             ctx: RunContext[GalaxyAgentDependencies],
             query: str,
@@ -108,9 +108,8 @@ class GTNTrainingAgent(BaseGalaxyAgent):
                 )
             except (AttributeError, KeyError, TypeError) as e:
                 log.warning(f"GTN search failed: {e}")
-                return json.dumps({"error": str(e)})'''
+                return json.dumps({"error": str(e)})
 
-            
         @agent.tool
         async def search_gtn_tutorial_vectors(
             ctx: RunContext[GalaxyAgentDependencies],
@@ -137,7 +136,7 @@ class GTNTrainingAgent(BaseGalaxyAgent):
                 log.warning(f"GTN vector search failed: {e}")
                 return json.dumps({"error": str(e)})
 
-        '''@agent.tool
+        @agent.tool
         async def get_tutorial_content(
             ctx: RunContext[GalaxyAgentDependencies],
             topic: str,
@@ -214,7 +213,7 @@ class GTNTrainingAgent(BaseGalaxyAgent):
                 )
             except (AttributeError, KeyError, TypeError) as e:
                 log.warning(f"Tool search failed: {e}")
-                return json.dumps({"error": str(e)})'''
+                return json.dumps({"error": str(e)})
 
         return agent
 

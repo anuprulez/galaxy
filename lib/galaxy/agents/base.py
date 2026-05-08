@@ -414,7 +414,7 @@ class BaseGalaxyAgent(ABC):
     async def _run_with_retry(
         self,
         prompt: str,
-        max_retries: int = 3,
+        max_retries: int = 5,
         base_delay: float = 1.0,
         message_history: Optional[list[ModelMessage]] = None,
     ):
@@ -424,6 +424,7 @@ class BaseGalaxyAgent(ABC):
         model_settings: ModelSettings = {
             "temperature": self._get_temperature(),
             "max_tokens": self._get_max_tokens(),
+            "tool_choice": "required",
         }
 
         for attempt in range(max_retries + 1):
