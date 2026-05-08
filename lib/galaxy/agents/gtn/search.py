@@ -26,7 +26,7 @@ GTN_DATABASE_URL = "https://depot.galaxyproject.org/chatgxy/gtn_search.db"
 
 GTN_VECTOR_STORE_URL = "/home/anup/galaxycodes/galaxy/gtn_vectors/galaxy/lib/galaxy/agents/gtn/vector_store/"
 
-GTN_VECTOR_CHROMADB_URL = "/home/anup/galaxycodes/galaxy/gtn_vectors/galaxy/lib/galaxy/agents/gtn/chromadb"
+GTN_VECTOR_CHROMADB_URL = "/home/anup/galaxycodes/galaxy/gtn_vectors/galaxy/lib/galaxy/agents/gtn/chromadb/"
 
 log = logging.getLogger(__name__)
 
@@ -179,11 +179,14 @@ class VectorSearchResult:
 @dataclass
 class VectorSearchDbResult:
     """Represents a search result from vector store db."""
+
+    type: str
+    topic: str
+    tutorial: str
     page_content: str
+    url: str
+    score: float
     source: str
-    content_type: str
-    data_source: str
-    score: float = 0.0
 
     def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for JSON serialization.
@@ -195,11 +198,13 @@ class VectorSearchDbResult:
         # Truncate page_content to reasonable length for LLM processing
         
         return {
+            "type": self.type,
+            "topic": self.topic,
+            "tutorial": self.tutorial,
             "page_content": self.page_content,
-            "source": self.source,
-            "content_type": self.content_type,
-            "data_source": self.data_source,
-            "score": round(self.score, 3),
+            "score": round(self.score, 2),
+            "url": self.url,
+            "source": self.source
         }
 
 
@@ -439,12 +444,12 @@ class GTNSearchDB:
             embeddings = OpenAIEmbeddings(
                 base_url="https://api.deepinfra.com/v1/openai",
                 model="BAAI/bge-large-en-v1.5",
-                api_key="2v7jO5zshabaCb1i0JJQmqVXbRciW5q2",
+                api_key="",
                 tiktoken_enabled=False,
                 check_embedding_ctx_length=False
             )
 
-            persist_dir = str(Path(GTN_VECTOR_CHROMADB_URL))
+            persist_dir = GTN_VECTOR_CHROMADB_URL
             
             # Check if the persist directory exists
             if not Path(persist_dir).exists():
@@ -464,13 +469,15 @@ class GTNSearchDB:
 
             vector_results = []
 
-            for doc, score in results_with_scores:
+            for i, (doc, score) in enumerate(results_with_scores, start=1):
                 result = VectorSearchDbResult(
-                    page_content=doc.page_content,
-                    source=doc.metadata["source"], #get("source", ""),
-                    content_type=doc.metadata["content_type"], #get("content_type", ""),
-                    data_source=doc.metadata["data_source"], #get("data_source", ""),
-                    score=float(score),
+                    type=doc.metadata["type"],
+                    topic=doc.metadata["topic"],
+                    tutorial=doc.metadata["tutorial"],
+                    page_content=str(doc.page_content),
+                    score=score,
+                    url=doc.metadata["url"],
+                    source=doc.metadata["data_source"],
                 )
                 vector_results.append(result)
 

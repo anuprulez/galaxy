@@ -6,9 +6,7 @@ from pathlib import Path
 from llama_index.core import StorageContext, load_index_from_storage, Settings
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 
-#from langchain_community.vectorstores import Chroma
 from langchain_community.vectorstores import Chroma
-#from langchain_chroma import Chroma
 from langchain_openai import OpenAIEmbeddings
 
 
@@ -69,16 +67,18 @@ def search_chromadb_vectors(store_path: str, query: str, top_k: int = 5):
 
     print("Using Chroma vector store for similarity search using query:", query)
 
-    results =  vectorstore.similarity_search(query, k=5)
+    #results =  vectorstore.similarity_search(query, k=5)
+    results_with_scores = vectorstore.similarity_search_with_score(query, k=5)
 
-    print(f"Found {len(results)} similar documents")
+    print(f"Found {len(results_with_scores)} similar documents")
 
-    for i, doc in enumerate(results, start=1):
+    for i, (doc, score) in enumerate(results_with_scores, start=1):
         print("=" * 80)
         print(f"Document: {doc}")
         print(f"Metadata: {doc.metadata}")
         print(f"Metadata: {doc.metadata['source']}")
         print(f"Content: {doc.page_content}")
+        print(f"Score: {score}")
         print()
 
 

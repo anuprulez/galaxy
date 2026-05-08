@@ -3019,14 +3019,15 @@ galaxy:
 
   # API key for an AI provider. AI provider is Openai By default
   # (https://openai.com/) to enable the wizard (or more?)
-  ai_api_key: sk-da981eae31564c25aded69ac4b3a54bd #2v7jO5zshabaCb1i0JJQmqVXbRciW5q2
+  ai_api_key: 2v7jO5zshabaCb1i0JJQmqVXbRciW5q2
+  #sk-da981eae31564c25aded69ac4b3a54bd #2v7jO5zshabaCb1i0JJQmqVXbRciW5q2
 
   # AI API base URL. Needs to be OpenAI compatible, defaults to OpenAI
-  ai_api_base_url: https://openwebui.uni-freiburg.de/api #https://api.deepinfra.com/v1/openai
+  ai_api_base_url: https://api.deepinfra.com/v1/openai #https://api.deepinfra.com/v1/openai
   #https://openwebui.uni-freiburg.de/api
 
   # AI model to enable the wizard. Global fallback for all AI agents.
-  ai_model: standard-chat-ufr #openai/gpt-oss-120b #
+  ai_model: openai/gpt-oss-120b #standard-chat-ufr #openai/gpt-oss-120b #
 
   # Configuration for AI inference services used by agents and
   # visualization plugins. Supports per-agent or per-plugin model,

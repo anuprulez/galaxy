@@ -124,7 +124,7 @@ class GTNTrainingAgent(BaseGalaxyAgent):
             if not self.gtn_db:
                 return json.dumps({"error": "GTN database not available"})
             try:
-                results = self.gtn_db.search_vector_db(query=query, limit=10)
+                results = self.gtn_db.search_vector_db(query=query, limit=limit)
                 log.info(f"GTN search found {len(results)} results, vector search found {len(results)} results for query: '{query}'")
 
                 return json.dumps(
