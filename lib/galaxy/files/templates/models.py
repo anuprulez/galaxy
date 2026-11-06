@@ -51,6 +51,7 @@ FileSourceTemplateType = Literal[
     "rspace",
     "dataverse",
     "cbioportal",
+    "bioairepo",
     "huggingface",
     "github",
     "iiif",
@@ -467,6 +468,24 @@ class CBioPortalFileSourceConfiguration(StrictModel):
     writable: bool = False
 
 
+class BioAIRepoFileSourceTemplateConfiguration(StrictModel):
+    type: Literal["bioairepo"]
+    api_url: str | TemplateExpansion = "https://www.ebi.ac.uk/biostudies/api/v1"
+    files_url: str | TemplateExpansion = "https://www.ebi.ac.uk/biostudies/files"
+    collection: str | TemplateExpansion = "BioAIRepo"
+    writable: bool | TemplateExpansion = False
+    template_start: str | None = None
+    template_end: str | None = None
+
+
+class BioAIRepoFileSourceConfiguration(StrictModel):
+    type: Literal["bioairepo"]
+    api_url: str = "https://www.ebi.ac.uk/biostudies/api/v1"
+    files_url: str = "https://www.ebi.ac.uk/biostudies/files"
+    collection: str = "BioAIRepo"
+    writable: bool = False
+
+
 class HuggingFaceFileSourceTemplateConfiguration(StrictModel):
     type: Literal["huggingface"]
     token: str | TemplateExpansion | None = None
@@ -694,6 +713,7 @@ FileSourceTemplateConfiguration = Annotated[
     | RSpaceFileSourceTemplateConfiguration
     | DataverseFileSourceTemplateConfiguration
     | CBioPortalFileSourceTemplateConfiguration
+    | BioAIRepoFileSourceTemplateConfiguration
     | HuggingFaceFileSourceTemplateConfiguration
     | GithubFileSourceTemplateConfiguration
     | IIIFFileSourceTemplateConfiguration
@@ -729,6 +749,7 @@ FileSourceConfiguration = Annotated[
     | RSpaceFileSourceConfiguration
     | DataverseFileSourceConfiguration
     | CBioPortalFileSourceConfiguration
+    | BioAIRepoFileSourceConfiguration
     | HuggingFaceFileSourceConfiguration
     | GithubFileSourceConfiguration
     | IIIFFileSourceConfiguration
@@ -824,6 +845,7 @@ TypesToConfigurationClasses: dict[FileSourceTemplateType, type[FileSourceConfigu
     "rspace": RSpaceFileSourceConfiguration,
     "dataverse": DataverseFileSourceConfiguration,
     "cbioportal": CBioPortalFileSourceConfiguration,
+    "bioairepo": BioAIRepoFileSourceConfiguration,
     "huggingface": HuggingFaceFileSourceConfiguration,
     "github": GithubFileSourceConfiguration,
     "iiif": IIIFFileSourceConfiguration,
