@@ -820,7 +820,7 @@ galaxy:
   # Configured FileSource plugins.
   # The value of this option will be resolved with respect to
   # <config_dir>.
-  #file_sources_config_file: file_sources_conf.yml
+  file_sources_config_file: file_sources_conf.yml
 
   # FileSource plugins described embedded into Galaxy's config.
   #file_sources: null
@@ -877,14 +877,14 @@ galaxy:
   # If this is set to None, the default container resolvers loaded is
   # determined by enable_mulled_containers. For available options see
   # https://docs.galaxyproject.org/en/master/admin/container_resolvers.html
-  #container_resolvers_config_file: null
+  container_resolvers_config_file: container_resolvers.yml
 
   # Rather than specifying a container_resolvers_config_file, the
   # definition of the resolvers to enable can be embedded into Galaxy's
   # config with this option. This has no effect if a
   # container_resolvers_config_file is used. Takes the same options that
   # can be set in container_resolvers_config_file.
-  #container_resolvers: null
+  #container_resolvers: container_resolvers.yml
 
   # involucro is a tool used to build Docker or Singularity containers
   # for tools from Conda dependencies referenced in tools as
@@ -2802,7 +2802,7 @@ galaxy:
   # configuration file or the <job_config> option.
   # The value of this option will be resolved with respect to
   # <config_dir>.
-  #job_config_file: job_conf.yml
+  job_config_file: job_conf.yml
 
   # Description of job running configuration, can be embedded into
   # Galaxy configuration or loaded from an additional file with the

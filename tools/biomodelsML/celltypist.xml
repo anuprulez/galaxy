@@ -1,0 +1,117 @@
+<tool id="celltypist" name="CellTypist" version="@VERSION@+galaxy4" profile="@PROFILE@">
+    <description>automated cell-type annotation for single-cell transcriptomics data</description>
+    <macros>
+        <import>macros.xml</import>
+    </macros>
+    <expand macro="creators" />
+    <requirements>
+        <container type="docker">quay.io/teichlab/celltypist:@VERSION@</container>
+    </requirements>
+    <version_command>python -c "import celltypist; print(celltypist.__version__)"</version_command>
+    <command detect_errors="exit_code"><![CDATA[
+mkdir -p .cache/numba .cache/matplotlib &&
+export NUMBA_CACHE_DIR='.cache/numba' &&
+export MPLCONFIGDIR='.cache/matplotlib' &&
+ln -s '$input_file' 'input.${input_file.ext}' &&
+mkdir output &&
+celltypist
+    --indata 'input.${input_file.ext}'
+    --model '$model'
+    --outdir output
+    --mode '$prediction.mode'
+#if $prediction.mode == 'prob_match'
+    --p-thres '$prediction.probability_threshold'
+#end if
+#if str($transpose_input) == 'true'
+    --transpose-input
+#end if
+#if $majority_voting.enabled == 'true'
+    --majority-voting
+    --min-prop '$majority_voting.minimum_proportion'
+#end if
+&&
+cp output/predicted_labels.csv '$predicted_labels' &&
+cp output/decision_matrix.csv '$decision_matrix' &&
+cp output/probability_matrix.csv '$probability_matrix'
+    ]]></command>
+    <inputs>
+        <param name="input_file" type="data" format="h5ad,csv,tabular" label="Single-cell expression data" help="Count matrix (cells by genes by default) or log1p-normalized AnnData object." />
+        <param name="model" type="select" label="CellTypist model">
+            <option value="Immune_All_Low.pkl" selected="true">Immune All Low</option>
+            <option value="Immune_All_High.pkl">Immune All High</option>
+        </param>
+        <conditional name="prediction">
+            <param name="mode" type="select" label="Prediction mode">
+                <option value="best_match" selected="true">Best match</option>
+                <option value="prob_match">Probability match (multi-label)</option>
+            </param>
+            <when value="best_match" />
+            <when value="prob_match">
+                <param name="probability_threshold" type="float" value="0.5" min="0" max="1" label="Probability threshold" />
+            </when>
+        </conditional>
+        <param name="transpose_input" type="boolean" truevalue="true" falsevalue="false" checked="false" label="Genes are rows and cells are columns" help="Enable this for gene-by-cell tabular matrices." />
+        <conditional name="majority_voting">
+            <param name="enabled" type="select" label="Apply majority voting" help="Refine predictions using over-clustering.">
+                <option value="false" selected="true">No</option>
+                <option value="true">Yes</option>
+            </param>
+            <when value="false" />
+            <when value="true">
+                <param name="minimum_proportion" type="float" value="0" min="0" max="1" label="Minimum dominant-cell-type proportion" />
+            </when>
+        </conditional>
+    </inputs>
+    <outputs>
+        <data name="predicted_labels" format="csv" label="${tool.name} on ${on_string}: predicted labels" />
+        <data name="decision_matrix" format="csv" label="${tool.name} on ${on_string}: decision matrix" />
+        <data name="probability_matrix" format="csv" label="${tool.name} on ${on_string}: probability matrix" />
+    </outputs>
+    <tests>
+        <test expect_num_outputs="3">
+            <param name="input_file" value="celltypist_input.csv" ftype="csv" />
+            <param name="model" value="Immune_All_Low.pkl" />
+            <param name="prediction|mode" value="best_match" />
+            <param name="transpose_input" value="false" />
+            <param name="majority_voting|enabled" value="false" />
+            <output name="predicted_labels">
+                <assert_contents>
+                    <has_text text="predicted_labels" />
+                    <has_n_lines n="4" />
+                </assert_contents>
+            </output>
+            <output name="decision_matrix">
+                <assert_contents>
+                    <has_n_lines n="4" />
+                </assert_contents>
+            </output>
+            <output name="probability_matrix">
+                <assert_contents>
+                    <has_n_lines n="4" />
+                </assert_contents>
+            </output>
+        </test>
+    </tests>
+    <help><![CDATA[
+**What it does**
+
+CellTypist annotates cells from single-cell RNA-sequencing expression data using pretrained logistic-regression classifiers.
+
+**Inputs**
+
+For CSV or tabular input, supply raw counts with cells as rows and gene symbols as columns. Enable **Genes are rows and cells are columns** when the matrix is transposed. AnnData input must contain log1p-normalized expression (10,000 counts per cell) in ``.X`` or ``.raw.X``.
+
+The **Immune All Low** model is intended for broad immune-cell populations, while **Immune All High** provides finer immune-cell resolution.
+
+**Prediction modes**
+
+Best match assigns the highest-scoring type to each cell. Probability match can return no label, one label, or multiple labels according to the selected probability threshold. Majority voting optionally refines labels using over-clustering.
+
+**Outputs**
+
+The tool returns predicted cell labels, decision scores, and cell-type probabilities as CSV datasets.
+    ]]></help>
+    <citations>
+        <citation type="doi">10.1126/science.abl5197</citation>
+    </citations>
+</tool>

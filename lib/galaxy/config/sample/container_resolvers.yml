@@ -1,0 +1,2 @@
+# Resolve explicit container requirements declared by Galaxy tool wrappers.
+- type: explicit

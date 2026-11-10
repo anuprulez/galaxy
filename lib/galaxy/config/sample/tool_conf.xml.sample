@@ -152,6 +152,9 @@
     <tool file="phenotype_association/ldtools.xml" />
     <tool file="phenotype_association/master2pg.xml" />
   </section>
+  <section id="single_cell" name="Single-cell Analysis">
+    <tool file="biomodelsML/celltypist.xml" />
+  </section>
   <!--
   <section id="interactivetools" name="Interactive tools">
     <tool file="interactive/interactivetool_askomics.xml" />

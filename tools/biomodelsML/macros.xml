@@ -1,0 +1,10 @@
+<macros>
+    <token name="@PROFILE@">22.05</token>
+    <token name="@VERSION@">1.6.1</token>
+    <xml name="creators">
+        <creator>
+            <organization name="Teichmann Lab" url="https://www.celltypist.org/" />
+            <person name="Anup Kumar" email="kumara@informatik.uni-freiburg.de" />
+        </creator>
+    </xml>
+</macros>

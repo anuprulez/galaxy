@@ -1,0 +1,4 @@
+cell,CD3D,MS4A1,LST1,NKG7,GNLY
+T_cell,100,0,1,25,2
+B_cell,0,100,1,0,0
+NK_cell,2,0,5,100,100

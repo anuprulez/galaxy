@@ -44,6 +44,16 @@
   timeout: 10
   port: 21
 
+# Browse and import public AI-ready biology studies from EMBL-EBI BioStudies.
+- type: bioairepo
+  id: bioairepo
+  label: BioAIRepo
+  doc: Public AI-ready biology studies from EMBL-EBI BioStudies
+  api_url: https://www.ebi.ac.uk/biostudies/api/v1
+  files_url: https://www.ebi.ac.uk/biostudies/files
+  collection: BioAIRepo
+  writable: false
+
 - type: ftp
   id: ncbi-ftp
   label: "NCBI FTP server"
