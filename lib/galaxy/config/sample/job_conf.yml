@@ -13,3 +13,15 @@ execution:
       docker_auto_rm: true
       docker_volumes: $defaults
       require_container: false
+    local_inference_container:
+      runner: local
+      docker_enabled: true
+      docker_sudo: false
+      docker_auto_rm: true
+      docker_volumes: $defaults
+      docker_run_extra_arguments: --entrypoint=
+      require_container: true
+
+tools:
+  - id: ml-inference
+    environment: local_inference_container

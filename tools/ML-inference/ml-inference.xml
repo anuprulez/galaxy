@@ -1,0 +1,54 @@
+<tool id="ml-inference" name="ml-inference" version="0.2.0+galaxy0" profile="22.05">
+    <description>predict cell types with an uploaded CellTypist model</description>
+    <requirements>
+        <container type="docker">inference-container:0.1</container>
+    </requirements>
+    <command detect_errors="exit_code"><![CDATA[
+mkdir -p output &&
+python3 '$__tool_directory__/predict_celltypist.py'
+    --input '$input_file'
+    --model '$model_file'
+    --predicted-labels 'output/predicted_labels.csv'
+    --decision-matrix 'output/decision_matrix.csv'
+    --probability-matrix 'output/probability_matrix.csv'
+    --mode '$prediction.mode'
+    #if $prediction.mode == 'prob_match'
+    --probability-threshold '$prediction.probability_threshold'
+    #end if
+    #if str($transpose_input) == 'true'
+    --transpose-input
+    #end if
+    ]]></command>
+    <inputs>
+        <param name="input_file" type="data" format="csv,tabular" label="Single-cell raw-count matrix" help="Cells by genes, with cell identifiers in the first column and gene symbols in the header." />
+        <param name="model_file" type="data" format="data" label="CellTypist model (.pkl)" help="A trusted CellTypist model pickle, such as Immune_All_Low.pkl. Pickle files can execute code while loading; only upload models from trusted sources." />
+        <conditional name="prediction">
+            <param name="mode" type="select" label="Prediction mode">
+                <option value="best_match" selected="true">Best match</option>
+                <option value="prob_match">Probability match (multi-label)</option>
+            </param>
+            <when value="best_match" />
+            <when value="prob_match">
+                <param name="probability_threshold" type="float" value="0.5" min="0" max="1" label="Probability threshold" />
+            </when>
+        </conditional>
+        <param name="transpose_input" type="boolean" truevalue="true" falsevalue="false" checked="false" label="Genes are rows and cells are columns" />
+    </inputs>
+    <outputs>
+        <collection name="inference_outputs" type="list" label="${tool.name} on ${on_string}: outputs">
+            <discover_datasets pattern="__name_and_ext__" directory="output" />
+        </collection>
+    </outputs>
+    <help><![CDATA[
+**What it does**
+
+This tool applies an uploaded CellTypist logistic-regression model to a single-cell raw-count matrix inside the local ``inference-container:0.1`` image. It performs CellTypist-compatible count normalization, gene matching, scaling, and prediction.
+
+Supply CSV or tabular data with cells in rows and gene symbols in columns. The first column contains cell identifiers. Enable **Genes are rows and cells are columns** for a transposed matrix. Upload a trusted CellTypist ``.pkl`` model such as ``Immune_All_Low.pkl``.
+
+The output collection contains ``predicted_labels.csv``, ``decision_matrix.csv``, and ``probability_matrix.csv``.
+    ]]></help>
+    <citations>
+        <citation type="doi">10.1126/science.abl5197</citation>
+    </citations>
+</tool>

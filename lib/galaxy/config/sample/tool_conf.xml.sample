@@ -154,6 +154,10 @@
   </section>
   <section id="single_cell" name="Single-cell Analysis">
     <tool file="biomodelsML/celltypist.xml" />
+    <tool file="ML-inference/ml-inference.xml" />
+  </section>
+  <section id="metagenomic_biome" name="Metagenomic Biome Classification">
+    <tool file="biomodelsML/trapiche.xml" />
   </section>
   <!--
   <section id="interactivetools" name="Interactive tools">

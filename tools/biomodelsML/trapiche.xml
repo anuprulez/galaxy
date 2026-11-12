@@ -1,0 +1,75 @@
+<tool id="trapiche" name="Trapiche" version="0.0.0+galaxy0" profile="24.0">
+    <description>classify metagenomic samples by biome from text and taxonomy</description>
+    <requirements>
+        <!-- TODO: Replace this placeholder with the finalized Trapiche image and pinned tag. -->
+        <container type="docker">docker.io/library/python:3.11-slim</container>
+    </requirements>
+    <command detect_errors="exit_code"><![CDATA[
+trapiche -
+#if str($run_text) == 'false'
+    --no-run-text
+#else
+    --run-text
+#end if
+#if str($run_vectorise) == 'false'
+    --no-run-vectorise
+#else
+    --run-vectorise
+#end if
+#if str($run_taxonomy) == 'false'
+    --no-run-taxonomy
+#else
+    --run-taxonomy
+#end if
+#if str($sample_study_text_heuristic) == 'true'
+    --sample-study-text-heuristic
+#else
+    --no-sample-study-text-heuristic
+#end if
+#if str($disable_minimal_result) == 'true'
+    --disable-minimal-result
+#end if
+< '$input_ndjson'
+> '$output_ndjson'
+    ]]></command>
+    <inputs>
+        <param name="input_ndjson" type="data" format="json" label="Trapiche sample records (NDJSON)" help="One JSON object per line. The final wrapper must stage and rewrite taxonomy dataset paths once the Galaxy input model is finalized." />
+        <param name="run_text" type="boolean" truevalue="true" falsevalue="false" checked="true" label="Run text-based classification" />
+        <param name="run_vectorise" type="boolean" truevalue="true" falsevalue="false" checked="true" label="Vectorize taxonomy profiles" />
+        <param name="run_taxonomy" type="boolean" truevalue="true" falsevalue="false" checked="true" label="Run taxonomy-based classification" />
+        <param name="sample_study_text_heuristic" type="boolean" truevalue="true" falsevalue="false" checked="false" label="Use the sample-over-study text heuristic" />
+        <param name="disable_minimal_result" type="boolean" truevalue="true" falsevalue="false" checked="false" label="Return workflow-controlled full results" help="By default Trapiche returns its compact result." />
+    </inputs>
+    <outputs>
+        <data name="output_ndjson" format="json" label="${tool.name} on ${on_string}: biome classifications" />
+    </outputs>
+    <help><![CDATA[
+**Skeleton status**
+
+This wrapper mirrors Trapiche's current NDJSON command-line interface, but it is intentionally not production-ready. The declared ``python:3.11-slim`` container is a placeholder and does not contain Trapiche.
+
+Before release, finalize:
+
+- the Trapiche container repository, immutable version tag, and version command;
+- the Galaxy representation of per-sample taxonomy TSV/TSV.GZ datasets;
+- staging and rewriting of ``sample_taxonomy_paths`` and ``taxonomy_study_tsv`` inside NDJSON records;
+- model acquisition or mounted offline model assets;
+- CPU/GPU and memory requirements;
+- representative test datasets and output assertions.
+
+**Planned input**
+
+Trapiche consumes one JSON object per line. Records can contain external text predictions, free-text descriptions, sample/project identifiers, and taxonomy paths. External predictions use ``ext_text_pred_project`` and ``ext_text_pred_sample``. Taxonomy input currently uses ``sample_taxonomy_paths`` or ``taxonomy_study_tsv``.
+
+**Planned output**
+
+The output is NDJSON containing biome-classification results for each submitted sample.
+    ]]></help>
+    <citations>
+        <citation type="bibtex">@misc{trapiche,
+  title = {Trapiche: Multi-source biome classification from text and taxonomy},
+  author = {{Finn Lab}},
+  url = {https://github.com/Finn-Lab/trapiche}
+}</citation>
+    </citations>
+</tool>
