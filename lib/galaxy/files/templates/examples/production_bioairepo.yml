@@ -1,0 +1,13 @@
+- id: bioairepo
+  version: 0
+  name: BioAIRepo
+  description: |
+    [BioAIRepo](https://www.ebi.ac.uk/biostudies/bioairepo/studies) is the
+    EMBL-EBI BioStudies collection for AI-ready biology data. This read-only
+    file source lets Galaxy users browse public studies and import their files.
+  configuration:
+    type: bioairepo
+    api_url: https://www.ebi.ac.uk/biostudies/api/v1
+    files_url: https://www.ebi.ac.uk/biostudies/files
+    collection: BioAIRepo
+    writable: false
