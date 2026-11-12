@@ -1,71 +1,60 @@
-<tool id="trapiche" name="Trapiche" version="0.0.0+galaxy0" profile="24.0">
-    <description>classify metagenomic samples by biome from text and taxonomy</description>
+<tool id="trapiche" name="Trapiche" version="1.1.4+galaxy5" profile="24.0">
+    <description>classify a metagenomic sample by biome from its description</description>
     <requirements>
-        <!-- TODO: Replace this placeholder with the finalized Trapiche image and pinned tag. -->
-        <container type="docker">docker.io/library/python:3.11-slim</container>
+        <container type="docker">trapiche-text-s-bair13:1.1.4-1</container>
     </requirements>
+    <required_files>
+        <include path="stage_trapiche_models.py" />
+    </required_files>
+    <version_command>trapiche-galaxy --version</version_command>
     <command detect_errors="exit_code"><![CDATA[
-trapiche -
-#if str($run_text) == 'false'
-    --no-run-text
-#else
-    --run-text
-#end if
-#if str($run_vectorise) == 'false'
-    --no-run-vectorise
-#else
-    --run-vectorise
-#end if
-#if str($run_taxonomy) == 'false'
-    --no-run-taxonomy
-#else
-    --run-taxonomy
-#end if
-#if str($sample_study_text_heuristic) == 'true'
-    --sample-study-text-heuristic
-#else
-    --no-sample-study-text-heuristic
-#end if
-#if str($disable_minimal_result) == 'true'
-    --disable-minimal-result
-#end if
-< '$input_ndjson'
-> '$output_ndjson'
+python3 '$__tool_directory__/stage_trapiche_models.py' '$model_selection' trapiche_models &&
+trapiche-galaxy
+    --models trapiche_models
+    --mode text
+    --description-file '$description_data'
+    --sample-id '$sample_id'
+    --threads '$threads'
+    --output '$predictions'
+    --provenance '$provenance'
+    --log-file '$log_file'
     ]]></command>
+    <configfiles>
+        <configfile name="model_selection">#import json
+#set $selected_models = [{"path": str($dataset), "name": str($dataset.name)} for $dataset in $model_files]
+${json.dumps($selected_models)}
+        </configfile>
+    </configfiles>
     <inputs>
-        <param name="input_ndjson" type="data" format="json" label="Trapiche sample records (NDJSON)" help="One JSON object per line. The final wrapper must stage and rewrite taxonomy dataset paths once the Galaxy input model is finalized." />
-        <param name="run_text" type="boolean" truevalue="true" falsevalue="false" checked="true" label="Run text-based classification" />
-        <param name="run_vectorise" type="boolean" truevalue="true" falsevalue="false" checked="true" label="Vectorize taxonomy profiles" />
-        <param name="run_taxonomy" type="boolean" truevalue="true" falsevalue="false" checked="true" label="Run taxonomy-based classification" />
-        <param name="sample_study_text_heuristic" type="boolean" truevalue="true" falsevalue="false" checked="false" label="Use the sample-over-study text heuristic" />
-        <param name="disable_minimal_result" type="boolean" truevalue="true" falsevalue="false" checked="false" label="Return workflow-controlled full results" help="By default Trapiche returns its compact result." />
+        <param name="description_data" type="data" format="txt" label="Sample or study description" help="Select a plain-text Galaxy dataset containing the description used to predict the biome." />
+        <param name="model_files" type="data" format="data" multiple="true" label="Trapiche model files" help="Select all required Trapiche text and vector model files. Keep their original downloaded or prepared filenames so the tool can place them in the required model layout." />
+        <param name="sample_id" type="text" value="sample-001" label="Sample identifier">
+            <validator type="regex" message="Use letters, numbers, periods, underscores, or hyphens only.">^[A-Za-z0-9._-]+$</validator>
+        </param>
+        <param name="threads" type="integer" value="4" min="1" label="CPU threads" />
     </inputs>
     <outputs>
-        <data name="output_ndjson" format="json" label="${tool.name} on ${on_string}: biome classifications" />
+        <data name="predictions" format="json" label="${tool.name} on ${on_string}: predictions" />
+        <data name="provenance" format="json" label="${tool.name} on ${on_string}: provenance" />
+        <data name="log_file" format="txt" label="${tool.name} on ${on_string}: log" />
     </outputs>
     <help><![CDATA[
-**Skeleton status**
+**What it does**
 
-This wrapper mirrors Trapiche's current NDJSON command-line interface, but it is intentionally not production-ready. The declared ``python:3.11-slim`` container is a placeholder and does not contain Trapiche.
+Trapiche predicts the biome represented by a metagenomic sample using its study description. The tool runs the container's ``trapiche-galaxy --mode text`` workflow and verifies the required model files before inference.
 
-Before release, finalize:
+The CPU runtime and model artifacts are documented by BioAIrepo study ``S-BAIR13``. The local image is derived from the study's released Trapiche 1.1.4 Linux AMD64 runtime and is pinned to its registry digest.
 
-- the Trapiche container repository, immutable version tag, and version command;
-- the Galaxy representation of per-sample taxonomy TSV/TSV.GZ datasets;
-- staging and rewriting of ``sample_taxonomy_paths`` and ``taxonomy_study_tsv`` inside NDJSON records;
-- model acquisition or mounted offline model assets;
-- CPU/GPU and memory requirements;
-- representative test datasets and output assertions.
+Select a plain-text description dataset and all required Trapiche text and vector model files from the Galaxy history. The defaults reproduce sample ID ``sample-001`` and four CPU threads from the documented invocation.
 
-**Planned input**
+**Administrator requirement**
 
-Trapiche consumes one JSON object per line. Records can contain external text predictions, free-text descriptions, sample/project identifiers, and taxonomy paths. External predictions use ``ext_text_pred_project`` and ``ext_text_pred_sample``. Taxonomy input currently uses ``sample_taxonomy_paths`` or ``taxonomy_study_tsv``.
+The selected model files are staged inside the isolated job working directory according to their filenames. Both original download names such as ``text_classifier_model_1.0.safetensors`` and prepared names such as ``model_1.0.safetensors`` are accepted. Text mode requires the six executable files from ``text/1.0`` and all six files from ``vector/1.0``; the text model-card README and the approximately 10 GB taxonomy model are not required. Trapiche verifies every selected runtime asset against the study's sizes and checksums before inference.
 
-**Planned output**
-
-The output is NDJSON containing biome-classification results for each submitted sample.
+The tool produces the prediction record, reproducibility provenance (including checksums and runtime information), and the Trapiche execution log.
     ]]></help>
     <citations>
+        <citation type="doi">10.6019/S-BAIR13</citation>
         <citation type="bibtex">@misc{trapiche,
   title = {Trapiche: Multi-source biome classification from text and taxonomy},
   author = {{Finn Lab}},
